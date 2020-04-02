@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon_32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon_16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/pace-js@1.0.2/themes/blue/pace-theme-center-atom.css">
+  <script src="//cdn.jsdelivr.net/npm/pace-js@1/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Gemini","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true,"b2t":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="从一道很经典的闭包问题说起…">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深入理解JavaScript之由一道题来思考闭包">
+<meta property="og:url" content="http://yoursite.com/2019/10/24/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3JavaScript%E4%B9%8B%E7%94%B1%E4%B8%80%E9%81%93%E9%A2%98%E6%9D%A5%E6%80%9D%E8%80%83%E9%97%AD%E5%8C%85/index.html">
+<meta property="og:site_name" content="Jacky">
+<meta property="og:description" content="从一道很经典的闭包问题说起…">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-10-24T15:39:32.000Z">
+<meta property="article:modified_time" content="2020-03-29T15:42:54.468Z">
+<meta property="article:author" content="Jacky Lin">
+<meta property="article:tag" content="JavaScript">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2019/10/24/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3JavaScript%E4%B9%8B%E7%94%B1%E4%B8%80%E9%81%93%E9%A2%98%E6%9D%A5%E6%80%9D%E8%80%83%E9%97%AD%E5%8C%85/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>深入理解JavaScript之由一道题来思考闭包 | Jacky</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Jacky</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="search-pop-overlay">
+  <div class="popup search-popup">
+      <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+  </div>
+</div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/24/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3JavaScript%E4%B9%8B%E7%94%B1%E4%B8%80%E9%81%93%E9%A2%98%E6%9D%A5%E6%80%9D%E8%80%83%E9%97%AD%E5%8C%85/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Jacky Lin">
+      <meta itemprop="description" content="不忘初心，方得始终">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jacky">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          深入理解JavaScript之由一道题来思考闭包
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-10-24 23:39:32" itemprop="dateCreated datePublished" datetime="2019-10-24T23:39:32+08:00">2019-10-24</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3JavaScript/" itemprop="url" rel="index"><span itemprop="name">深入理解JavaScript</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.9k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>从一道很经典的闭包问题说起…</p>
+<a id="more"></a>
+<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><blockquote>
+<p>闭包就是指有权访问另一个函数作用域中的变量的函数</p>
+</blockquote>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html lang=<span class="string">"en"</span>&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">&lt;meta charset=<span class="string">"UTF-8"</span>&gt;</span><br><span class="line">&lt;title&gt;点击li标签弹出对应数字&lt;<span class="regexp">/title&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;ul&gt;</span><br><span class="line">    &lt;li&gt;<span class="number">0</span>&lt;<span class="regexp">/li&gt;</span></span><br><span class="line"><span class="regexp">    &lt;li&gt;1&lt;/</span>li&gt;</span><br><span class="line">    &lt;li&gt;<span class="number">2</span>&lt;<span class="regexp">/li&gt;</span></span><br><span class="line"><span class="regexp">    &lt;li&gt;3&lt;/</span>li&gt;</span><br><span class="line">&lt;<span class="regexp">/ul&gt;</span></span><br><span class="line"><span class="regexp">&lt;script&gt;</span></span><br><span class="line"><span class="regexp">    var list = document.getElementsByTagName('li');</span></span><br><span class="line"><span class="regexp">    for(var i = 0;i &lt; list.length;i++)&#123;</span></span><br><span class="line"><span class="regexp">     list[i].onclick = function()&#123;</span></span><br><span class="line"><span class="regexp">         alert(i);</span></span><br><span class="line"><span class="regexp">     &#125;</span></span><br><span class="line"><span class="regexp">&lt;/</span>script&gt;</span><br><span class="line">&lt;<span class="regexp">/body&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>html&gt;</span><br></pre></td></tr></table></figure>
+
+<p>如上题，最为常见的一个例子，这里解释由这道题引出的js知识点，如上我们知道在浏览器运行无论点击哪个li标签都是弹出3,首先来理解为什么会弹出3。</p>
+<p>程序通过for循环给每个li标签绑定了事件，然后通过点击li标签触发方法，即执行alert(i)。js中有个作用域链查找机制，首先会在onclick返回的函数作用域查找i变量的值，找不到则往上一层找i，上一层即是window全局作用域，即找到全局变量i，即for循环定义的i。</p>
+<p>注意for循环的i并不是私有变量，而是全局变量。</p>
+<blockquote>
+<p>js中所有的事件绑定都是异步编程（当前这件事件没有彻底完成，不再等待，继续执行下面的任务）</p>
+</blockquote>
+<p>当绑定onclick事件后，不需要等待执行，继续执行下一个循环任务，所以当我们点击执行方法的时候，循环早已结束,即是最后i=3。故程序执行后全局变量i被循环执行后赋值为最终的3，所以当点击的时候，外层循环已经结束，页面加载完成预示着js代码都已经执行完成，即执行alert(i)时，由于i不是私有变量，便会找到上一级window作用域全局的i，所以无论点击哪个li标签都是弹出3</p>
+<h2 id="为什么要用闭包"><a href="#为什么要用闭包" class="headerlink" title="为什么要用闭包"></a>为什么要用闭包</h2><p>那么，解决这个问题的缘由，在于i每次在页面加载完就赋值为3，alert(i)的时候总是找到全局变量i。在ES5传统语法中，能形成作用域的只有全局和函数，现在每次i找的都是全局，那么要保住i的值只能在全局和onclick返回函数的作用域中间再加一个小的私有作用域，即是大的作用域外再加一个小的作用域，这样i往上一层作用域查找时，就会获取小作用域的i的值，而不会去获取全局变量的i值。</p>
+<p>这个思路解决问题就需要引入闭包，在这个理解上闭包是指函数变量可以保存在函数作用域内，因此看起来是函数将变量“包裹”了起来。于是，代码改成：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(<span class="keyword">var</span> i = <span class="number">0</span>;i &lt; list.length;i++)&#123;</span><br><span class="line">    list[i].onclick = (<span class="function"><span class="keyword">function</span>(<span class="params">n</span>)</span>&#123;<span class="comment">//形参n</span></span><br><span class="line">        <span class="comment">//=&gt;让自执行函数执行,把执行的返回值(return)赋值给onclick</span></span><br><span class="line">        <span class="comment">//（此处onclick绑定的是返回的小函数，点击的时候执行的是小函数）,</span></span><br><span class="line">        <span class="comment">// 自执行函数在给事件赋值的时候就已经执行了</span></span><br><span class="line">        <span class="comment">// 自执行函数形成一个私有作用域</span></span><br><span class="line">        <span class="keyword">var</span> i = n;</span><br><span class="line">        <span class="keyword">return</span> <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">            alert(i);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)(i);<span class="comment">//传入实参i</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>循环三次，形成三个不销毁的私有作用域（自执行函数执行），而每一个不销毁的栈内存中都存储了一个私有变量i，而这个值分别是每一次执行传递进来的全局i的值（也就是：第一个不销毁的作用域存储的是0，第二个是1，第三个是2，第四个是3）；当点击的时候，执行返回的小函数，遇到变量i，向它自己的上级作用域查找。这样就达到了我们需要的效果，这种闭包实现，也可以有另一种写法。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*原理同法二都是形成三个不销毁的私有作用域,分别存储需要的索引值*/</span></span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">var</span> i = <span class="number">0</span>;i &lt; list.length;i++)&#123;</span><br><span class="line">    (<span class="function"><span class="keyword">function</span>(<span class="params">n</span>)</span>&#123;</span><br><span class="line">        list[n].onclick = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">            alert(n);</span><br><span class="line">        &#125; </span><br><span class="line">    &#125;)(i)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>对于初始的代码，如果说为什么不能实现，那原因就可归纳为：</p>
+<blockquote>
+</blockquote>
+<ol>
+<li>执行方法,形成一个私有的栈内存,遇到变量i,i不是私有变量,向上一级作用域查找（上级作用域window）</li>
+<li>所有的事件绑定都是异步编程,绑定事件后,不需要等待执行,继续执行下一个循环任务,所以当我们点击执行方法的时候,循环早已结束（让全局的i等于循环最后的结果3）</li>
+</ol>
+<h2 id="ES6语法的解决方式"><a href="#ES6语法的解决方式" class="headerlink" title="ES6语法的解决方式"></a>ES6语法的解决方式</h2><p>在ES6中，解决这种问题只需要一个let变量，ES6中才有块级作用域（类似于私有作用域）的概念</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(<span class="keyword">let</span> i = <span class="number">0</span>;i &lt; list.length;i++)&#123;</span><br><span class="line">    list[i].onclick = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">        alert(i);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="闭包对内存的影响"><a href="#闭包对内存的影响" class="headerlink" title="闭包对内存的影响"></a>闭包对内存的影响</h2><p>从上面可知，每次for都会形成一个私有作用域，每个都里面保存的变量i的值，程序运行后这些作用域并不会被销毁，所以由于闭包会携带包含它的函数的作用域，所以会比其他函数占用更多内容，过度使用闭包会导致内存占用过多。</p>
+<p>在真实项目中为了保证JS的性能（堆栈内存的性能优化），应该尽可能的减少闭包的使用（不销毁的堆栈内存是耗性能的）</p>
+<h2 id="堆内存和栈内存的释放"><a href="#堆内存和栈内存的释放" class="headerlink" title="堆内存和栈内存的释放"></a>堆内存和栈内存的释放</h2><p>这里又要提到一个知识点，js中存储方式的分类：</p>
+<blockquote>
+<p>JS中的内存分为堆内存和栈内存<br>堆内存：存储引用数据类型值（对象：键值对  函数：代码字符串）<br>栈内存：提供JS代码执行的环境和存储基本类型值</p>
+</blockquote>
+<p>粗暴理解var定义的变量存在栈内存中，如for循环中的i是存在栈内存中的；而函数，它是存在堆内存中</p>
+<p><strong>一般情况下，当函数执行完成，所形成的私有作用域（栈内存）都会自动释放掉（在栈内存中存储的值也都会释放掉）</strong>，那为什么闭包的栈内存不会被自动释放掉，在js中也有特殊不被销毁的情况：</p>
+<blockquote>
+<p>1.函数执行完成，当前形成的栈内存中，某些内容被栈内存以外的变量占用了，此时栈内存不能释放（一旦释放外面找不到原有的内容了）<br>2.全局栈内存只有在页面关闭的时候才会被释放掉</p>
+</blockquote>
+<p>闭包则是属于第一种情况，onclick函数形成的栈内存，被小函数【alert(i)，i找到onclick作用域获取i值】占用了onclick函数的栈内存（变量i是存在栈内存中），故栈内存不能被释放，所以才会说闭包过度使用容易导致内存被占用过多，因为不会自动释放内存。</p>
+<p><strong>堆内存的释放</strong></p>
+<blockquote>
+<p>堆内存让所有引用堆内存空间地址的变量赋值为null即可（没有变量占用这个堆内存了，浏览器会在空闲的时候把它释放掉）</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+     
+      <div>
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:24px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+      </div>
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/JavaScript/" rel="tag"><i class="fa fa-tag"></i> JavaScript</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/10/23/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3JavaScript%E4%B9%8B%E5%8F%98%E9%87%8F%E6%8F%90%E5%8D%87/" rel="prev" title="深入理解JavaScript之变量提升">
+      <i class="fa fa-chevron-left"></i> 深入理解JavaScript之变量提升
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/10/26/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3JavaScript%E4%B9%8B%E8%8E%B7%E5%8F%96%E6%95%B0%E7%BB%84%E4%B8%AD%E7%9A%84%E6%9C%80%E5%A4%A7%E5%80%BC%E6%96%B9%E6%B3%95%EF%BC%88this-apply%EF%BC%89/" rel="next" title="深入理解JavaScript之获取数组中的最大值方法（this,apply）">
+      深入理解JavaScript之获取数组中的最大值方法（this,apply） <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#概念"><span class="nav-number">1.</span> <span class="nav-text">概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么要用闭包"><span class="nav-number">2.</span> <span class="nav-text">为什么要用闭包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ES6语法的解决方式"><span class="nav-number">3.</span> <span class="nav-text">ES6语法的解决方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#闭包对内存的影响"><span class="nav-number">4.</span> <span class="nav-text">闭包对内存的影响</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#堆内存和栈内存的释放"><span class="nav-number">5.</span> <span class="nav-text">堆内存和栈内存的释放</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Jacky Lin"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Jacky Lin</p>
+  <div class="site-description" itemprop="description">不忘初心，方得始终</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Jacky-Summer" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Jacky-Summer" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://blog.csdn.net/lxjstudyit" title="CSDN → https:&#x2F;&#x2F;blog.csdn.net&#x2F;lxjstudyit" rel="noopener" target="_blank"><i class="fa fa-fw fa-codiepie"></i>CSDN</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://juejin.im/user/5d77c17bf265da03c61e7c24" title="掘金 → https:&#x2F;&#x2F;juejin.im&#x2F;user&#x2F;5d77c17bf265da03c61e7c24" rel="noopener" target="_blank"><i class="fa fa-fw fa-drupal"></i>掘金</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jacky Lin</span>
+</div>
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.7.2
+  </div>
+-->
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共3.8k字</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  <!-- 页面点击小红心 -->
+  
+      <script type="text/javascript" src="/js/clicklove.js"></script>
+
+</body>
+</html>
