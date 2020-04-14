@@ -115,7 +115,7 @@
 不加loading效果，这样写<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">axios(&#123;</span><br><span class="line">  url: <span class="string">'/manage/statistic/base_count.do'</span>,</span><br><span class="line">  headers: &#123;</span><br><span class="line">    <span class="string">'isLoading'</span>: <span class="literal">false</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;).then(<span class="function"><span class="params">res</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">this</span>.setState(res.data)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
 <h2 id="效果"><a href="#效果" class="headerlink" title="效果"></a>效果</h2></li>
 </ol>
-<p><img src="https://user-gold-cdn.xitu.io/2020/3/29/17126d31a0fc0571?w=1854&h=954&f=gif&s=427836" alt=""></p>
+<p><img src="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2020/3/29/17126d31a0fc0571?w=1854&h=954&f=gif&s=427836" alt=""></p>
 ]]></content>
       <categories>
         <category>React笔记</category>
@@ -401,15 +401,15 @@
 <p>在上述代码中，函数的 prototype 属性指向了一个对象，这个对象正是调用该构造函数而创建的实例的原型，也就是这个例子中的animal1和animal2的原型</p>
 <p>每一个JavaScript对象(null除外)在创建的时候就会与之关联另一个对象，这个对象就是我们所说的原型，每一个对象都会从原型”继承”属性。</p>
 <p>构造函数和实例原型关系如下图：</p>
-<p><img src="https://user-gold-cdn.xitu.io/2020/2/15/17049498b6d308cb?w=885&h=207&f=png&s=21292" alt=""></p>
+<p><img src="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2020/2/15/17049498b6d308cb?w=885&h=207&f=png&s=21292" alt=""></p>
 <h2 id="proto"><a href="#proto" class="headerlink" title="proto"></a><strong>proto</strong></h2><p>那么如何表示实例与实例原型之间的关系呢，这里需要讲到另一个属性<strong>proto</strong></p>
 <p>每一个JavaScript对象(除了 null)都具有的一个属性，叫<strong>proto</strong>，这个属性会指向该对象的原型</p>
 <figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Animal</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> dog = <span class="keyword">new</span> Animal();</span><br><span class="line"><span class="built_in">console</span>.log(dog.__proto__ === Animal.prototype); <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
 <p>于是更新实例与实例原型之间的关系如下图：</p>
-<p><img src="https://user-gold-cdn.xitu.io/2020/2/15/17049522bfa417ec?w=866&h=336&f=png&s=32709" alt=""></p>
+<p><img src="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2020/2/15/17049522bfa417ec?w=866&h=336&f=png&s=32709" alt=""></p>
 <h2 id="constructor-NaN"><a href="#constructor-NaN" class="headerlink" title="constructor"></a>constructor</h2><p>每个原型都有一个constructor属性指向关联的构造函数</p>
 <figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Animal</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">console</span>.log(Animal === Animal.prototype.constructor); <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
-<p><img src="https://user-gold-cdn.xitu.io/2020/2/15/170496796080e487?w=849&h=347&f=png&s=35480" alt=""></p>
+<p><img src="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2020/2/15/170496796080e487?w=849&h=347&f=png&s=35480" alt=""></p>
 <p>则可以得出：</p>
 <figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Animal</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> dog = <span class="keyword">new</span> Animal();</span><br><span class="line"><span class="built_in">console</span>.log(dog.__proto__ === Animal.prototype) <span class="comment">// true</span></span><br><span class="line"><span class="comment">// Object.getPrototypeOf() 方法返回指定对象的原型</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Object</span>.getPrototypeOf(dog) === Animal.prototype) <span class="comment">// true</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(Animal.prototype.constructor == Animal) <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
 <p>再提一点：</p>
@@ -425,7 +425,7 @@
 <figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> obj = <span class="keyword">new</span> <span class="built_in">Object</span>();</span><br><span class="line">obj.name = <span class="string">'kiki'</span></span><br><span class="line"><span class="built_in">console</span>.log(obj.name) <span class="comment">// kiki</span></span><br></pre></td></tr></table></figure>
 <p>其实原型对象就是通过 Object 构造函数生成的，所有函数的 默认原型 都是 Object 的实例，因此默认原型都会包含一个内部指针，指向 Object.prototype。</p>
 <p>由此，更新关系图：</p>
-<p><img src="https://user-gold-cdn.xitu.io/2020/2/16/1704bf72a35f1a74?w=861&h=505&f=png&s=54960" alt=""></p>
+<p><img src="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2020/2/16/1704bf72a35f1a74?w=861&h=505&f=png&s=54960" alt=""></p>
 <h2 id="原型链"><a href="#原型链" class="headerlink" title="原型链"></a>原型链</h2><ol>
 <li>每个对象都拥有一个原型对象: dog的原型是Animal.prototype。</li>
 <li>对象的原型可能也是继承其他原型对象的: Animal.prototype也有它的原型Object.prototype。</li>
@@ -434,7 +434,7 @@
 <p>那么<code>Object.prototype</code>的原型是什么呢？</p>
 <figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Object</span>.prototype.__proto__ === <span class="literal">null</span>) <span class="comment">// true</span></span><br><span class="line"><span class="keyword">const</span> proto = <span class="built_in">Object</span>.getPrototypeOf(<span class="built_in">Object</span>.prototype) <span class="comment">// null</span></span><br></pre></td></tr></table></figure>
 <p>所以 Object.prototype.<strong>proto</strong> 的值为 null 跟 Object.prototype 没有原型，其实表达了一个意思。null 表示此处不应该有值，也就是原型链的终点了，所以查找属性的时候查到 Object.prototype 就可以停止查找了。</p>
-<p><img src="https://user-gold-cdn.xitu.io/2020/2/16/1704bffc23da9aaf?w=800&h=592&f=png&s=54550" alt=""></p>
+<p><img src="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2020/2/16/1704bffc23da9aaf?w=800&h=592&f=png&s=54550" alt=""></p>
 <p>上图中的红色线组成的链就可以称之为原型链。</p>
 <p>由上述关系图我们可以重新描述一下原型链：</p>
 <blockquote>
@@ -694,15 +694,15 @@
 <h3 id="原生具备Iterator接口的数据结构"><a href="#原生具备Iterator接口的数据结构" class="headerlink" title="原生具备Iterator接口的数据结构"></a>原生具备Iterator接口的数据结构</h3><p>在ES6中，所有的集合对象，包括数组，类数组对象（arguments对象、DOM NodeList 对象），Map和Set，还有字符串都是可迭代的，都可以被for…of遍历，因为他们都有默认的迭代器。</p>
 <p>下面就挑其中几个类型来举例子：</p>
 <h4 id="数组"><a href="#数组" class="headerlink" title="数组"></a>数组</h4><figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> arr = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];</span><br><span class="line"> </span><br><span class="line"><span class="keyword">var</span> iteratorObj = arr[<span class="built_in">Symbol</span>.iterator]();</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(iteratorObj.next());</span><br><span class="line"><span class="built_in">console</span>.log(iteratorObj.next());</span><br><span class="line"><span class="built_in">console</span>.log(iteratorObj.next());</span><br><span class="line"><span class="built_in">console</span>.log(iteratorObj.next());</span><br></pre></td></tr></table></figure>
-<p>输出结果：<br><img src="https://user-gold-cdn.xitu.io/2020/1/8/16f8433c4b0b041a?w=294&h=282&f=png&s=23046" alt=""><br>由上述对迭代器的概念认识，输出结果也完全符合我们预期。</p>
+<p>输出结果：<br><img src="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2020/1/8/16f8433c4b0b041a?w=294&h=282&f=png&s=23046" alt=""><br>由上述对迭代器的概念认识，输出结果也完全符合我们预期。</p>
 <h4 id="arguments"><a href="#arguments" class="headerlink" title="arguments"></a>arguments</h4><p>我们知道普通对象是默认没有部署这个接口的，所以arguments这个属性没有在原型上，而是在对象自身的属性上。</p>
 <figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">   <span class="keyword">var</span> obj = <span class="built_in">arguments</span>[<span class="built_in">Symbol</span>.iterator]();</span><br><span class="line">   <span class="built_in">console</span>.log(<span class="built_in">arguments</span>);</span><br><span class="line">   <span class="built_in">console</span>.log(obj.next());</span><br><span class="line">   <span class="built_in">console</span>.log(obj.next());</span><br><span class="line">   <span class="built_in">console</span>.log(obj.next());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">test(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>);</span><br></pre></td></tr></table></figure>
 <p>输出结果：</p>
-<p><img src="https://user-gold-cdn.xitu.io/2020/1/8/16f8446fec7e2102?w=508&h=197&f=png&s=20591" alt=""></p>
+<p><img src="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2020/1/8/16f8446fec7e2102?w=508&h=197&f=png&s=20591" alt=""></p>
 <h4 id="NodeList"><a href="#NodeList" class="headerlink" title="NodeList"></a>NodeList</h4><figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"test"</span>&gt;</span>1<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"test"</span>&gt;</span>2<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"test"</span>&gt;</span>3<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
 <figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> nodeList = <span class="built_in">document</span>.getElementsByClassName(<span class="string">'test'</span>)</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">const</span> node <span class="keyword">of</span> nodeList) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(node);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>输出结果：</p>
-<p><img src="https://user-gold-cdn.xitu.io/2020/1/8/16f84531078f206d?w=236&h=61&f=png&s=3489" alt=""></p>
+<p><img src="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2020/1/8/16f84531078f206d?w=236&h=61&f=png&s=3489" alt=""></p>
 <h4 id="map"><a href="#map" class="headerlink" title="map"></a>map</h4><p>这次直接从原型上找来证明</p>
 <figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Map</span>.prototype.hasOwnProperty(<span class="built_in">Symbol</span>.iterator)); <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
 
@@ -828,10 +828,10 @@
 <p>注意这里不是双引号，而是反撇号`</p>
 <p>在模板字符串中，还可以拼接html元素，同时空格、缩进、换行都会被保留，并且如果模板字符串中的变量没有声明，将报错。</p>
 <figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> str = <span class="string">`</span></span><br><span class="line"><span class="string">    &lt;div&gt;</span></span><br><span class="line"><span class="string">        &lt;ul&gt;</span></span><br><span class="line"><span class="string">            &lt;li&gt;11&lt;/li&gt;</span></span><br><span class="line"><span class="string">            &lt;li&gt;22&lt;/li&gt;</span></span><br><span class="line"><span class="string">        &lt;/ul&gt;</span></span><br><span class="line"><span class="string">    &lt;/div&gt;</span></span><br><span class="line"><span class="string">`</span>;</span><br></pre></td></tr></table></figure>
-<p><img src="https://user-gold-cdn.xitu.io/2020/1/5/16f75f81fdc039fd?w=283&h=118&f=png&s=3077" alt=""></p>
+<p><img src="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2020/1/5/16f75f81fdc039fd?w=283&h=118&f=png&s=3077" alt=""></p>
 <p>上面代码中，<code>&lt;div&gt;</code>标签前面会有一个换行。如果你不想要这个换行，可以使用trim方法消除它。</p>
 <figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> str = <span class="string">`</span></span><br><span class="line"><span class="string">    &lt;div&gt;</span></span><br><span class="line"><span class="string">        &lt;ul&gt;</span></span><br><span class="line"><span class="string">            &lt;li&gt;11&lt;/li&gt;</span></span><br><span class="line"><span class="string">            &lt;li&gt;22&lt;/li&gt;</span></span><br><span class="line"><span class="string">        &lt;/ul&gt;</span></span><br><span class="line"><span class="string">    &lt;/div&gt;</span></span><br><span class="line"><span class="string">`</span>.trim();</span><br><span class="line"><span class="built_in">console</span>.log(str);</span><br></pre></td></tr></table></figure>
-<p><img src="https://user-gold-cdn.xitu.io/2020/1/5/16f75fa6f941fbc2?w=285&h=115&f=png&s=3098" alt=""></p>
+<p><img src="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2020/1/5/16f75fa6f941fbc2?w=285&h=115&f=png&s=3098" alt=""></p>
 <p>在模版字符串内使用反引号`时，需要在它前面加转义符\</p>
 <figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> a = <span class="string">`hello \\n`</span>;</span><br><span class="line"><span class="built_in">console</span>.log(a);</span><br></pre></td></tr></table></figure>
 
@@ -992,8 +992,8 @@
     <content><![CDATA[<p>记录一个项目中经常会用到的技巧，footer区（比如版权信息）要始终居于页面底部。如果用fixed定位显然不可取，因为要保证页面高度大于屏幕高度时，footer区要跟随着页面滚动保持在底部</p>
 <a id="more"></a>
 <p>如下图：</p>
-<p><img src="https://user-gold-cdn.xitu.io/2019/12/7/16ee0e36c5c55fea?w=1737&h=899&f=png&s=23364" alt=""></p>
-<p><img src="https://user-gold-cdn.xitu.io/2019/12/7/16ee0e3a25e302bd?w=1577&h=903&f=png&s=27932" alt=""></p>
+<p><img src="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2019/12/7/16ee0e36c5c55fea?w=1737&h=899&f=png&s=23364" alt=""></p>
+<p><img src="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2019/12/7/16ee0e3a25e302bd?w=1577&h=903&f=png&s=27932" alt=""></p>
 <ul>
 <li>tip：以下两个方法仅适用于footer区高度固定的情况</li>
 </ul>
@@ -1131,7 +1131,7 @@
 <figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">fn1</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'fn1被调用了 -- 创建了fn1的函数执行上下文，压入栈'</span>);</span><br><span class="line">  fn2(); </span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'fn2执行完成，fn2的执行上下文会从栈中弹出'</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">fn2</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'fn2被调用了 -- 创建了fn2的函数执行上下文，压入栈'</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fn1();</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">'fn1执行完成，fn2的执行上下文会从栈中弹出'</span>);</span><br></pre></td></tr></table></figure>
 <p>运行结果：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">fn1被调用了 -- 创建了fn1的函数执行上下文，压入栈</span><br><span class="line">fn2被调用了 -- 创建了fn2的函数执行上下文，压入栈</span><br><span class="line">fn2执行完成，fn2的执行上下文会从栈中弹出</span><br><span class="line">fn1执行完成，fn2的执行上下文会从栈中弹出</span><br></pre></td></tr></table></figure>
-<p>上述代码的执行上下文栈：<br><img src="https://user-gold-cdn.xitu.io/2019/11/27/16ead7c041a4b415?w=1276&h=316&f=png&s=30716" alt=""></p>
+<p>上述代码的执行上下文栈：<br><img src="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2019/11/27/16ead7c041a4b415?w=1276&h=316&f=png&s=30716" alt=""></p>
 <p>当上述代码在浏览器加载时，JavaScript引擎创建了一个全局执行上下文并把它压入栈中，当函数fn1()被调用时，JavaScript为该函数创建了一个函数执行上下文，并把它压入当前执行栈的顶部。</p>
 <p>当fn1()函数内部调用fn2()函数时，JavaScript引擎同样创建了fn2()的函数执行上下文并压入栈的顶部。然后执行了fn2()函数后，fn2()函数会从当前栈（后进先出结构）弹出，并且按程序执行顺序继续执行fn1()函数，即此刻处于fn1的函数执行上下文。</p>
 <p>当 fn1()函数执行完毕，它的执行上下文从栈弹出，控制流程到达全局执行上下文。一旦所有代码执行完毕，JavaScript 引擎从当前栈中移除全局执行上下文。</p>
@@ -1210,7 +1210,7 @@
 <h2 id="组合继承"><a href="#组合继承" class="headerlink" title="组合继承"></a>组合继承</h2><p>核心：<strong>组合上述两种方法，用原型链实现对原型属性和方法的继承，用借用构造函数技术来实现实例属性的继承</strong>。</p>
 <figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Father</span>(<span class="params">name, age</span>)</span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.name = name;</span><br><span class="line">    <span class="keyword">this</span>.age = age;</span><br><span class="line">    <span class="keyword">this</span>.sex = <span class="string">'man'</span>;</span><br><span class="line">&#125;</span><br><span class="line">Father.prototype.getFatherName = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'父类的方法'</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Son</span>(<span class="params">name, age, job</span>)</span>&#123;</span><br><span class="line">    Father.call(<span class="keyword">this</span>,name,age); <span class="comment">// 第二次调用:创建子类型实例的时候</span></span><br><span class="line">    <span class="keyword">this</span>.job = job;</span><br><span class="line">&#125;</span><br><span class="line">Son.prototype = <span class="keyword">new</span> Father(); <span class="comment">// 第一次调用:设置子类型实例的原型的时候</span></span><br><span class="line">Son.prototype.constructor = Son; <span class="comment">// prototype构造器指回自己 </span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> son = <span class="keyword">new</span> Son(<span class="string">'jacky'</span>, <span class="number">22</span>, <span class="string">'前端开发'</span>);</span><br><span class="line">son.getFatherName();</span><br><span class="line"><span class="built_in">console</span>.log(son)</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://user-gold-cdn.xitu.io/2019/11/20/16e89812367319c7?w=517&h=227&f=png&s=19707" alt=""></p>
+<p><img src="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2019/11/20/16e89812367319c7?w=517&h=227&f=png&s=19707" alt=""></p>
 <p>优点：</p>
 <ol>
 <li>可以继承父类原型上的属性，可以传参，可复用。</li>
@@ -1249,7 +1249,7 @@
 </ol>
 <figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Father</span>(<span class="params">name, age</span>)</span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.name = name;</span><br><span class="line">    <span class="keyword">this</span>.age = age;</span><br><span class="line">&#125;</span><br><span class="line">Father.prototype.getFatherName = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'父类的方法'</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Son</span>(<span class="params">name, age, job</span>)</span>&#123;</span><br><span class="line">    Father.call(<span class="keyword">this</span>,name,age); <span class="comment">// 借用构造继承: 继承父类通过this声明属性和方法至子类实例的属性上</span></span><br><span class="line">    <span class="keyword">this</span>.job = job;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 寄生式继承：封装了son.prototype对象原型式继承father.prototype的过程，并且增强了传入的对象。</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">inheritPrototype</span>(<span class="params">son,father</span>)</span>&#123;</span><br><span class="line">    <span class="keyword">var</span> clone = <span class="built_in">Object</span>.create(father.prototype); <span class="comment">// 原型式继承：浅拷贝father.prototype对象</span></span><br><span class="line">    clone.constructor = son;  <span class="comment">// 增强对象，弥补因重写原型而失去的默认的constructor 属性</span></span><br><span class="line">    son.prototype = clone; <span class="comment">// 指定对象，将新创建的对象赋值给子类的原型</span></span><br><span class="line">&#125;</span><br><span class="line">inheritPrototype(Son,Father); <span class="comment">// 将父类原型指向子类</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 新增子类原型属性</span></span><br><span class="line">Son.prototype.getSonName = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'子类的方法'</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> son = <span class="keyword">new</span> Son(<span class="string">'jacky'</span>,<span class="number">22</span>,<span class="string">'前端开发'</span>);</span><br><span class="line"><span class="built_in">console</span>.log(son);</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://user-gold-cdn.xitu.io/2019/11/23/16e97782ff645ca0?w=361&h=182&f=png&s=24333" alt=""></p>
+<p><img src="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2019/11/23/16e97782ff645ca0?w=361&h=182&f=png&s=24333" alt=""></p>
 <ul>
 <li>寄生组合式继承相对于组合继承有如下优点：</li>
 </ul>

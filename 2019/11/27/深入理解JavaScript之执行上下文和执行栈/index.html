@@ -29,13 +29,13 @@
 <meta property="og:site_name" content="Jacky">
 <meta property="og:description" content="都说想成为出色的JavaScript 开发者，就要深入学习 JavaScript 程序内部的执行机制，最近学了一遍JS的执行上下文和执行栈，以此作总结。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/11/27/16ead7c041a4b415?w=1276&h=316&f=png&s=30716">
+<meta property="og:image" content="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2019/11/27/16ead7c041a4b415?w=1276&h=316&f=png&s=30716">
 <meta property="article:published_time" content="2019-11-27T14:01:06.000Z">
-<meta property="article:modified_time" content="2020-04-05T00:20:44.797Z">
+<meta property="article:modified_time" content="2020-04-14T12:25:34.154Z">
 <meta property="article:author" content="Jacky Lin">
 <meta property="article:tag" content="JavaScript">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://user-gold-cdn.xitu.io/2019/11/27/16ead7c041a4b415?w=1276&h=316&f=png&s=30716">
+<meta name="twitter:image" content="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2019/11/27/16ead7c041a4b415?w=1276&h=316&f=png&s=30716">
 
 <link rel="canonical" href="http://yoursite.com/2019/11/27/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3JavaScript%E4%B9%8B%E6%89%A7%E8%A1%8C%E4%B8%8A%E4%B8%8B%E6%96%87%E5%92%8C%E6%89%A7%E8%A1%8C%E6%A0%88/">
 
@@ -290,7 +290,7 @@
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">fn1</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'fn1被调用了 -- 创建了fn1的函数执行上下文，压入栈'</span>);</span><br><span class="line">  fn2(); </span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'fn2执行完成，fn2的执行上下文会从栈中弹出'</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">fn2</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'fn2被调用了 -- 创建了fn2的函数执行上下文，压入栈'</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fn1();</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">'fn1执行完成，fn2的执行上下文会从栈中弹出'</span>);</span><br></pre></td></tr></table></figure>
 <p>运行结果：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">fn1被调用了 -- 创建了fn1的函数执行上下文，压入栈</span><br><span class="line">fn2被调用了 -- 创建了fn2的函数执行上下文，压入栈</span><br><span class="line">fn2执行完成，fn2的执行上下文会从栈中弹出</span><br><span class="line">fn1执行完成，fn2的执行上下文会从栈中弹出</span><br></pre></td></tr></table></figure>
-<p>上述代码的执行上下文栈：<br><img src="https://user-gold-cdn.xitu.io/2019/11/27/16ead7c041a4b415?w=1276&h=316&f=png&s=30716" alt=""></p>
+<p>上述代码的执行上下文栈：<br><img src="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2019/11/27/16ead7c041a4b415?w=1276&h=316&f=png&s=30716" alt=""></p>
 <p>当上述代码在浏览器加载时，JavaScript引擎创建了一个全局执行上下文并把它压入栈中，当函数fn1()被调用时，JavaScript为该函数创建了一个函数执行上下文，并把它压入当前执行栈的顶部。</p>
 <p>当fn1()函数内部调用fn2()函数时，JavaScript引擎同样创建了fn2()的函数执行上下文并压入栈的顶部。然后执行了fn2()函数后，fn2()函数会从当前栈（后进先出结构）弹出，并且按程序执行顺序继续执行fn1()函数，即此刻处于fn1的函数执行上下文。</p>
 <p>当 fn1()函数执行完毕，它的执行上下文从栈弹出，控制流程到达全局执行上下文。一旦所有代码执行完毕，JavaScript 引擎从当前栈中移除全局执行上下文。</p>
