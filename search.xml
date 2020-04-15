@@ -987,6 +987,48 @@
       </tags>
   </entry>
   <entry>
+    <title>Vue实现星级评价效果</title>
+    <url>/2019/12/09/Vue%E5%AE%9E%E7%8E%B0%E6%98%9F%E7%BA%A7%E8%AF%84%E4%BB%B7%E6%95%88%E6%9E%9C/</url>
+    <content><![CDATA[<p>在做店家评价的时候，常常会有星级评价的效果，今天来试试看怎么实现它…</p>
+<a id="more"></a>
+<p>我们把星级评价单独做成一个Star组件，抽离出来，其中父组件中引入(传入的是评分的值)</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"score"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Star</span> <span class="attr">:score</span>=<span class="string">"poiInfo.wm_poi_score"</span>&gt;</span><span class="tag">&lt;/<span class="name">Star</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>初始Star.vue</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">      &lt;div class&#x3D;&quot;star&quot;&gt;</span><br><span class="line">          &lt;span class&#x3D;&quot;star-item&quot;&gt;&lt;&#x2F;span&gt;</span><br><span class="line">      &lt;&#x2F;div&gt;</span><br><span class="line">      &lt;span&gt;&#123;&#123; score &#125;&#125;&lt;&#x2F;span&gt;</span><br><span class="line">  &lt;&#x2F;div&gt;</span><br><span class="line">&lt;&#x2F;template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">export default &#123;</span><br><span class="line">    name: &#39;Star&#39;,</span><br><span class="line">    props: &#123;</span><br><span class="line">        score: Number</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+<p>首先我们把要做星级图片用类名为star-item的span标签循环出来，星级图片有三张，全星，半星，空星<br><img src="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2019/12/29/16f51be56d1a5ea8?w=20&h=19&f=png&s=1215" alt=""><br><img src="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2019/12/29/16f51bdf50383e0f?w=20&h=19&f=png&s=1349" alt=""><br><img src="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2019/12/29/16f51be27b49b42d?w=20&h=19&f=png&s=1220" alt=""></p>
+<p>下面只罗列关键的css部分, 通过增加类区分图片</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.star-item</span><span class="selector-class">.on</span> &#123;</span><br><span class="line">    <span class="attribute">background-image</span>: <span class="built_in">url</span>(./img/star24_on@<span class="number">2</span>x.png);</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.star-item</span><span class="selector-class">.half</span> &#123;</span><br><span class="line">    <span class="attribute">background-image</span>: <span class="built_in">url</span>(./img/star24_half@<span class="number">2</span>x.png);</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.star-item</span><span class="selector-class">.off</span> &#123;</span><br><span class="line">    <span class="attribute">background-image</span>: <span class="built_in">url</span>(./img/star24_off@<span class="number">2</span>x.png);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接下来修改Star.vue的代码</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"star"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">span</span> </span></span><br><span class="line"><span class="tag">    <span class="attr">class</span>=<span class="string">"star-item"</span> </span></span><br><span class="line"><span class="tag">    <span class="attr">v-for</span>=<span class="string">"(itemClass, index) in itemClasses"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">:key</span>=<span class="string">"index"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">:class</span>=<span class="string">"itemClass"</span></span></span><br><span class="line"><span class="tag">  &gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">span</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>itemClasses值是通过计算属性获取的，思路：</p>
+<ol>
+<li>通过computed返回一个长度为5的数组（显示5颗星）</li>
+<li>数组的值是上述css取的不同星对应的类名，再通过绑定每一个循环添加的class，从而遍历星级。</li>
+</ol>
+<p>比如举例评分：</p>
+<ul>
+<li>4.7分对应的数组为[‘on’, ‘on’, ‘on’, ‘on’, ‘half’]</li>
+<li>3.4分对应的数组为[‘on’, ‘on’, ‘on’, ‘half’, ‘half’]</li>
+</ul>
+<p>JS部分的代码：</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 星星长度 </span></span><br><span class="line"><span class="keyword">const</span> LENGTH = <span class="number">5</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 星星的状态</span></span><br><span class="line"><span class="keyword">const</span> CLS_ON = <span class="string">'on'</span></span><br><span class="line"><span class="keyword">const</span> CLS_HALF = <span class="string">'half'</span></span><br><span class="line"><span class="keyword">const</span> CLS_OFF = <span class="string">'off'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span><br><span class="line">    name: <span class="string">'Star'</span>,</span><br><span class="line">    props: &#123;</span><br><span class="line">        score: <span class="built_in">Number</span></span><br><span class="line">    &#125;,</span><br><span class="line">    computed: &#123;</span><br><span class="line">        itemClasses () &#123;</span><br><span class="line">            <span class="keyword">let</span> result = []</span><br><span class="line"></span><br><span class="line">            <span class="keyword">let</span> score = <span class="built_in">Math</span>.floor(<span class="keyword">this</span>.score * <span class="number">2</span>) / <span class="number">2</span></span><br><span class="line"></span><br><span class="line">            <span class="comment">// 半星 (通过跟1取余判断是否为小数)</span></span><br><span class="line">            <span class="keyword">let</span> hasDecimal = score % <span class="number">1</span> !== <span class="number">0</span></span><br><span class="line"></span><br><span class="line">            <span class="comment">// 全星 （向下取整，获取全星部分）</span></span><br><span class="line">            <span class="keyword">let</span> integer = <span class="built_in">Math</span>.floor(score)</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 遍历全星</span></span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; integer; i++)&#123;</span><br><span class="line">                result.push(CLS_ON)</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 处理半星</span></span><br><span class="line">            <span class="keyword">if</span>(hasDecimal)&#123;</span><br><span class="line">                result.push(CLS_HALF)</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 补齐</span></span><br><span class="line">            <span class="keyword">while</span>(result.length &lt; LENGTH)&#123; <span class="comment">// 到这里还不够五颗星，则凑空星</span></span><br><span class="line">                result.push(CLS_OFF)</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">return</span> result</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>itemClasses最终是返回了一个长度为5的数组，需要注意的是</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">let score &#x3D; Math.floor(this.score * 2) &#x2F; 2</span><br></pre></td></tr></table></figure>
+<p>半星的划分：只有当小数第一位大于或等于5才可以算为半星，否则是空星。该计算是为了小数部分&gt;=0.5的计算结果带有小数，从而再后面跟1取余判断是否为半星。一开始有点蒙，多试几个数想想就懂了。</p>
+<blockquote>
+<p>比如4.3分没有半星，4.5有半星出现</p>
+</blockquote>
+<p>结果：<br>比如传入的值为4.7，则显示</p>
+<p><img src="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2019/12/29/16f51d7db002aa38?w=161&h=28&f=png&s=5690" alt=""></p>
+]]></content>
+      <categories>
+        <category>Vue</category>
+      </categories>
+      <tags>
+        <tag>Vue</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>页面内容是否超出可视高度，footer始终保持底部显示</title>
     <url>/2019/12/07/CSS%E7%B3%BB%E5%88%97%E4%B9%8B%E9%A1%B5%E9%9D%A2%E5%86%85%E5%AE%B9%E6%98%AF%E5%90%A6%E8%B6%85%E5%87%BA%E5%8F%AF%E8%A7%86%E9%AB%98%E5%BA%A6%EF%BC%8Cfooter%E5%A7%8B%E7%BB%88%E4%BF%9D%E6%8C%81%E5%BA%95%E9%83%A8%E6%98%BE%E7%A4%BA/</url>
     <content><![CDATA[<p>记录一个项目中经常会用到的技巧，footer区（比如版权信息）要始终居于页面底部。如果用fixed定位显然不可取，因为要保证页面高度大于屏幕高度时，footer区要跟随着页面滚动保持在底部</p>
