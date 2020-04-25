@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon_32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon_16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/pace-js@1.0.2/themes/blue/pace-theme-center-atom.css">
+  <script src="//cdn.jsdelivr.net/npm/pace-js@1/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Gemini","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true,"b2t":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="react组件在绑定函数时，通常有三种方法，此文将对三种方法性能和写法展开写…">
+<meta property="og:type" content="article">
+<meta property="og:title" content="React函数this绑定的原因及四种绑定方式对比">
+<meta property="og:url" content="http://yoursite.com/2020/04/16/React%E5%87%BD%E6%95%B0this%E7%BB%91%E5%AE%9A%E7%9A%84%E5%8E%9F%E5%9B%A0%E5%8F%8A%E5%9B%9B%E7%A7%8D%E7%BB%91%E5%AE%9A%E6%96%B9%E5%BC%8F%E5%AF%B9%E6%AF%94/index.html">
+<meta property="og:site_name" content="Jacky">
+<meta property="og:description" content="react组件在绑定函数时，通常有三种方法，此文将对三种方法性能和写法展开写…">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-04-15T23:52:38.000Z">
+<meta property="article:modified_time" content="2020-04-24T23:53:32.379Z">
+<meta property="article:author" content="Jacky Lin">
+<meta property="article:tag" content="React">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2020/04/16/React%E5%87%BD%E6%95%B0this%E7%BB%91%E5%AE%9A%E7%9A%84%E5%8E%9F%E5%9B%A0%E5%8F%8A%E5%9B%9B%E7%A7%8D%E7%BB%91%E5%AE%9A%E6%96%B9%E5%BC%8F%E5%AF%B9%E6%AF%94/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>React函数this绑定的原因及四种绑定方式对比 | Jacky</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Jacky</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="search-pop-overlay">
+  <div class="popup search-popup">
+      <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+  </div>
+</div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/16/React%E5%87%BD%E6%95%B0this%E7%BB%91%E5%AE%9A%E7%9A%84%E5%8E%9F%E5%9B%A0%E5%8F%8A%E5%9B%9B%E7%A7%8D%E7%BB%91%E5%AE%9A%E6%96%B9%E5%BC%8F%E5%AF%B9%E6%AF%94/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Jacky Lin">
+      <meta itemprop="description" content="不忘初心，方得始终">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jacky">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          React函数this绑定的原因及四种绑定方式对比
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-16 07:52:38" itemprop="dateCreated datePublished" datetime="2020-04-16T07:52:38+08:00">2020-04-16</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/React%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">React笔记</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>4.8k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>4 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>react组件在绑定函数时，通常有三种方法，此文将对三种方法性能和写法展开写…</p>
+<a id="more"></a>
+
+<h2 id="为什么要绑定this"><a href="#为什么要绑定this" class="headerlink" title="为什么要绑定this"></a>为什么要绑定this</h2><p>首先，第一个很重要的问题就是，绑定this是什么原因？</p>
+<p>js里面的this绑定是代码执行的时候进行绑定的，而不是编写的时候，所以this的指向取决于函数调用时的各种条件。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> React, &#123; Component &#125; <span class="keyword">from</span> <span class="string">'react'</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BindEvent</span> <span class="keyword">extends</span> <span class="title">Component</span> </span>&#123;</span><br><span class="line">    <span class="keyword">constructor</span>(props) &#123;</span><br><span class="line">        <span class="keyword">super</span>(props)</span><br><span class="line">        <span class="keyword">this</span>.state = &#123;</span><br><span class="line">            name: <span class="string">'jacky'</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    handleClick() &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="keyword">this</span>.state.name)</span><br><span class="line">    &#125;</span><br><span class="line">    render() &#123;</span><br><span class="line">        <span class="keyword">return</span> (</span><br><span class="line">            &lt;div&gt;</span><br><span class="line">                &lt;button onClick=&#123;<span class="keyword">this</span>.handleClick&#125;&gt;Click&lt;<span class="regexp">/button&gt;</span></span><br><span class="line"><span class="regexp">            &lt;/</span>div&gt;</span><br><span class="line">        );</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> BindEvent;</span><br></pre></td></tr></table></figure>
+<p>来看上面这个例子，运行点击按钮，发现程序报错，即this指向不是所在类。由于类的方法默认不会绑定this，因此在调用的时候如果没有绑定，this的值将会是undefined。故我们需要手动绑定this</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Uncaught TypeError: Cannot read property &#39;state&#39; of undefined</span><br></pre></td></tr></table></figure>
+<p>需要我们自己绑定this，其实这不是react的锅，本质原因是 JavaScript 的 this 机制问题</p>
+<h2 id="this机制"><a href="#this机制" class="headerlink" title="this机制"></a>this机制</h2><p>来看下面一个例子：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> obj = &#123;</span><br><span class="line">    name: <span class="string">'obj'</span>,</span><br><span class="line">    getName: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="keyword">this</span>, <span class="keyword">this</span>.name);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line">obj.getName(); <span class="comment">// &#123;name: "obj", getName: ƒ&#125; "obj"</span></span><br></pre></td></tr></table></figure>
+<p>结果理所应当，使用<code>.</code>操作符调用函数obj.getName()，this指向的是obj对象，即obj对象是函数getName的调用者，但如果改成这样：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> middleObj = obj.getName;</span><br><span class="line">middleObj(); <span class="comment">// Window &#123;...&#125; ""</span></span><br></pre></td></tr></table></figure>
+<p>将getName函数引用赋值给middleObj变量，并使用这个新的函数引用去调用该函数时，打印出this为Window对象，关于this的指向，可简单粗暴理解为<strong>this 永远指向最后调用它的那个对象</strong>。</p>
+<p>如果没有显式调用一个函数，JS 的解释器就会把全局对象当作调用者，在浏览器则是Window对象为调用者。</p>
+<p>如果使用严格模式，那么没有显式的使用调用者的情况下，this指向undefined 。</p>
+<p>理解完上面，我们用类来作为参照：</p>
+<p>下面定义了一个类，类里的display访问this.name属性</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Foo</span> </span>&#123;</span><br><span class="line">    <span class="keyword">constructor</span>(name) &#123;</span><br><span class="line">        <span class="keyword">this</span>.name = name</span><br><span class="line">    &#125;</span><br><span class="line">    display() &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="keyword">this</span>); <span class="comment">// 运行打印： Foo &#123;name: "jacky"&#125;</span></span><br><span class="line">        <span class="built_in">console</span>.log(<span class="keyword">this</span>.name);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> foo = <span class="keyword">new</span> Foo(<span class="string">'jacky'</span>);</span><br><span class="line">foo.display(); <span class="comment">// jacky</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> display = foo.display; </span><br><span class="line">display();  </span><br><span class="line"><span class="comment">// undefined</span></span><br><span class="line"><span class="comment">// Uncaught TypeError: Cannot read property 'name' of undefined</span></span><br></pre></td></tr></table></figure>
+<p>当我们将一个函数引用赋值给某个其他变量，并使用这个新的函数引用去调用该函数时，在 display() 方法this为<code>undefined</code>，故找不到name值报错。</p>
+<p>在这里又有一个问题了，display这样直接调用，在非严格模式下调用者不是应该为Window对象吗？在这里，要知道一个知识点：</p>
+<p><strong>ES6 的 class 语法，所有在 class 中声明的方法都会自动地使用严格模式</strong></p>
+<h2 id="React的JSX"><a href="#React的JSX" class="headerlink" title="React的JSX"></a>React的JSX</h2><p>说了这么多，这跟React那个有什么联系呢，想搞清楚为什么绑定this这个问题前，就想先弄明白JSX到底是一个什么东西。</p>
+<blockquote>
+<p>本质上来讲，JSX 只是为 React.createElement(component, props, …children) 方法提供的语法糖。</p>
+</blockquote>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;button className=<span class="string">"btn"</span> onClick=&#123;<span class="keyword">this</span>.handleClick&#125;&gt;</span><br><span class="line">    Click Me</span><br><span class="line">&lt;<span class="regexp">/button&gt;</span></span><br></pre></td></tr></table></figure>
+<p>经babel编译为：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">React.createElement(</span><br><span class="line">    <span class="string">"button"</span>, </span><br><span class="line">    &#123; <span class="attr">className</span>: <span class="string">"btn"</span>, <span class="attr">onClick</span>: <span class="keyword">this</span>.handleClick &#125;, </span><br><span class="line">    <span class="string">"Click Me"</span></span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<p>我们把render方法里的JSX手动写成编译后这种形式：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Example</span> <span class="keyword">extends</span> <span class="title">React</span>.<span class="title">Component</span> </span>&#123;</span><br><span class="line">    <span class="keyword">constructor</span>(props)&#123;</span><br><span class="line">        <span class="keyword">super</span>(props);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    handleClick(e) &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(e);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    render()&#123;</span><br><span class="line">        <span class="keyword">return</span> React.createElement(</span><br><span class="line">            <span class="string">"button"</span>, </span><br><span class="line">            &#123; <span class="attr">className</span>: <span class="string">"btn"</span>, <span class="attr">onClick</span>: <span class="keyword">this</span>.handleClick &#125;, </span><br><span class="line">            <span class="string">"Click Me"</span></span><br><span class="line">        );</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>React.createElement的第二个参数，传入的是一个对象，而这个对象里面有属性的值是取this 对象里面的属性 ，当这个对象放入React.createElement执行后，去取这个this.handleClick属性的时候，this已经不是我们在书写的时候认为的绑定在Example组件上了。this.handleClick这里的this会默认绑定，但是又是在ES6的class中，所以this绑定了undefined。</p>
+<p> 在JSX语法中: <code>onClick={ this.handleClick }</code>中onClick这个属性就是相当于上面的”中间变量”。</p>
+<p> 即是将<code>this.handleClick</code>函数赋值给onClick这个中间变量，后面不仅要进行JSX语法转化,将JSX组件转换成<strong>JS对象</strong>,还要再将Javascript对象转换成真实DOM。把onClick作为中间变量,指向一个函数的时候,后面的一系列处理中，使用onClick这个中间变量所指向的函数，里面的this自然就丢失掉了，不是再指向组件实例了。</p>
+<p> 所以，当在组件定义方法想访问this，才需要手动绑定。</p>
+<h2 id="绑定this的方法"><a href="#绑定this的方法" class="headerlink" title="绑定this的方法"></a>绑定this的方法</h2><h3 id="render方法中绑定this"><a href="#render方法中绑定this" class="headerlink" title="render方法中绑定this"></a>render方法中绑定this</h3> <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"> <span class="class"><span class="keyword">class</span> <span class="title">BindEvent</span> <span class="keyword">extends</span> <span class="title">Component</span> </span>&#123;</span><br><span class="line">    <span class="keyword">constructor</span>(props) &#123;</span><br><span class="line">        <span class="keyword">super</span>(props)</span><br><span class="line">        <span class="keyword">this</span>.state = &#123;</span><br><span class="line">            name: <span class="string">'jacky'</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    handleClick () &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="keyword">this</span>.state.name)</span><br><span class="line">    &#125;</span><br><span class="line">    render() &#123;</span><br><span class="line">        <span class="keyword">return</span> (</span><br><span class="line">            &lt;div&gt;</span><br><span class="line">                &lt;button onClick=&#123;<span class="keyword">this</span>.handleClick.bind(<span class="keyword">this</span>)&#125;&gt;点击&lt;<span class="regexp">/button&gt;</span></span><br><span class="line"><span class="regexp">            &lt;/</span>div&gt;</span><br><span class="line">        );</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这种方法即是在事件函数后使用<code>.bind(this)</code>将this绑定到当前组件中。因为 bind 函数会返回一个新的函数，所以每次父组件刷新时，都会重新生成一个函数，即使父组件传递给子组件其他的 props 值不变，子组件每次都会刷新，这将会影响性能，故不推荐使用。</p>
+<h3 id="render方法中使用箭头函数"><a href="#render方法中使用箭头函数" class="headerlink" title="render方法中使用箭头函数"></a>render方法中使用箭头函数</h3> <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"> <span class="class"><span class="keyword">class</span> <span class="title">BindEvent</span> <span class="keyword">extends</span> <span class="title">Component</span> </span>&#123;</span><br><span class="line">    <span class="keyword">constructor</span>(props) &#123;</span><br><span class="line">        <span class="keyword">super</span>(props)</span><br><span class="line">        <span class="keyword">this</span>.state = &#123;</span><br><span class="line">            name: <span class="string">'jacky'</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    handleClick () &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="keyword">this</span>.state.name)</span><br><span class="line">    &#125;</span><br><span class="line">    render() &#123;</span><br><span class="line">        <span class="keyword">return</span> (</span><br><span class="line">            &lt;div&gt;</span><br><span class="line">                &lt;button onClick=&#123;() =&gt; <span class="keyword">this</span>.handleClick()&#125;&gt;点击&lt;<span class="regexp">/button&gt;</span></span><br><span class="line"><span class="regexp">            &lt;/</span>div&gt;</span><br><span class="line">        );</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>首选要明确一点，<strong>箭头函数中，this 永远绑定了定义箭头函数所在的那个对象</strong></p>
+<p>这种方法写法比较简洁， 最大好处就是传参很灵活，父组件刷新的时候，即使两个箭头函数的函数体是一样的，都会生成一个新的箭头函数。这种方式重新创建函数性能的损耗小于第1种。</p>
+<h3 id="构造函数绑定this"><a href="#构造函数绑定this" class="headerlink" title="构造函数绑定this"></a>构造函数绑定this</h3> <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BindEvent</span> <span class="keyword">extends</span> <span class="title">Component</span> </span>&#123;</span><br><span class="line">    <span class="keyword">constructor</span>(props) &#123;</span><br><span class="line">        <span class="keyword">super</span>(props)</span><br><span class="line">        <span class="keyword">this</span>.state = &#123;</span><br><span class="line">            name: <span class="string">'jacky'</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">this</span>.handleClick = <span class="keyword">this</span>.handleClick.bind(<span class="keyword">this</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    handleClick () &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="keyword">this</span>.state.name)</span><br><span class="line">    &#125;</span><br><span class="line">    render() &#123;</span><br><span class="line">        <span class="keyword">return</span> (</span><br><span class="line">            &lt;div&gt;</span><br><span class="line">                &lt;button onClick=&#123;<span class="keyword">this</span>.handleClick&#125;&gt;点击&lt;<span class="regexp">/button&gt; </span></span><br><span class="line"><span class="regexp">            &lt;/</span>div&gt;</span><br><span class="line">        );</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p> 为了避免在render中绑定this引发可能的性能问题，可以在constructor中预先进行绑定。好处是仅需要绑定一次，避免每次渲染时都要重新绑定，也是常推荐的写法，就是写起来繁琐一点，要单独绑定。</p>
+<h3 id="在定义阶段使用箭头函数绑定"><a href="#在定义阶段使用箭头函数绑定" class="headerlink" title="在定义阶段使用箭头函数绑定"></a>在定义阶段使用箭头函数绑定</h3>  <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">  <span class="class"><span class="keyword">class</span> <span class="title">BindEvent</span> <span class="keyword">extends</span> <span class="title">Component</span> </span>&#123;</span><br><span class="line">    <span class="keyword">constructor</span>(props) &#123;</span><br><span class="line">        <span class="keyword">super</span>(props)</span><br><span class="line">        <span class="keyword">this</span>.state = &#123;</span><br><span class="line">            name: <span class="string">'jacky'</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    handleClick = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="keyword">this</span>.state.name)</span><br><span class="line">    &#125;</span><br><span class="line">    render() &#123;</span><br><span class="line">        <span class="keyword">return</span> (</span><br><span class="line">            &lt;div&gt;</span><br><span class="line">                &lt;button onClick=&#123;<span class="keyword">this</span>.handleClick&#125;&gt;点击&lt;<span class="regexp">/button&gt; </span></span><br><span class="line"><span class="regexp">            &lt;/</span>div&gt;</span><br><span class="line">        );</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这种写法是ES7的写法，ES6并不支持，不过我们可以配置你的开发环境支持ES7。</p>
+<p>这种方法避免了第1种和第2种的可能潜在的性能问题，也比第3种方法简洁，也是常推荐的写法。</p>
+<p>至于哪一种是最好的写法，目前还真的无法定论，有待以后开发中得出最佳实践…</p>
+<br>
+
+<ul>
+<li>ps： <a href="https://github.com/Jacky-Summer/personal-blog" target="_blank" rel="noopener">个人技术博文Github仓库</a>，欢迎star</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+     
+      <div>
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:24px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+      </div>
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/React/" rel="tag"><i class="fa fa-tag"></i> React</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/04/09/%E5%8E%9F%E7%94%9FJavaScript-DOM%E6%93%8D%E4%BD%9C%E5%B8%B8%E8%A7%81%E6%B1%87%E6%80%BB/" rel="prev" title="原生JavaScript DOM操作常见汇总">
+      <i class="fa fa-chevron-left"></i> 原生JavaScript DOM操作常见汇总
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/04/22/%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA%E8%BF%B7%E4%BD%A0Redux%EF%BC%88%E5%9F%BA%E7%A1%80%E7%89%88%EF%BC%89/" rel="next" title="实现一个迷你Redux（基础版）">
+      实现一个迷你Redux（基础版） <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么要绑定this"><span class="nav-number">1.</span> <span class="nav-text">为什么要绑定this</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#this机制"><span class="nav-number">2.</span> <span class="nav-text">this机制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#React的JSX"><span class="nav-number">3.</span> <span class="nav-text">React的JSX</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#绑定this的方法"><span class="nav-number">4.</span> <span class="nav-text">绑定this的方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#render方法中绑定this"><span class="nav-number">4.1.</span> <span class="nav-text">render方法中绑定this</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#render方法中使用箭头函数"><span class="nav-number">4.2.</span> <span class="nav-text">render方法中使用箭头函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#构造函数绑定this"><span class="nav-number">4.3.</span> <span class="nav-text">构造函数绑定this</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#在定义阶段使用箭头函数绑定"><span class="nav-number">4.4.</span> <span class="nav-text">在定义阶段使用箭头函数绑定</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Jacky Lin"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Jacky Lin</p>
+  <div class="site-description" itemprop="description">不忘初心，方得始终</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">30</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Jacky-Summer" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Jacky-Summer" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://blog.csdn.net/lxjstudyit" title="CSDN → https:&#x2F;&#x2F;blog.csdn.net&#x2F;lxjstudyit" rel="noopener" target="_blank"><i class="fa fa-fw fa-codiepie"></i>CSDN</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://juejin.im/user/5d77c17bf265da03c61e7c24" title="掘金 → https:&#x2F;&#x2F;juejin.im&#x2F;user&#x2F;5d77c17bf265da03c61e7c24" rel="noopener" target="_blank"><i class="fa fa-fw fa-drupal"></i>掘金</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jacky Lin</span>
+</div>
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.7.2
+  </div>
+-->
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共41.7k字</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  <!-- 页面点击小红心 -->
+  
+      <script type="text/javascript" src="/js/clicklove.js"></script>
+
+</body>
+</html>
