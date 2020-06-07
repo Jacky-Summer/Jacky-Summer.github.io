@@ -1,6 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>【React 原理（一）】实现 createElement 和 render 方法</title>
+    <url>/2020/06/06/%E3%80%90React-%E5%8E%9F%E7%90%86%EF%BC%88%E4%B8%80%EF%BC%89%E3%80%91%E5%AE%9E%E7%8E%B0-createElement-%E5%92%8C-render-%E6%96%B9%E6%B3%95/</url>
+    <content><![CDATA[<p>在 React 中，我们都知道可以写 jsx 代码会被编译成真正的 DOM 插入到要显示的页面上。这具体是怎么实现的，今天我们就自己动手做一下。</p>
+<a id="more"></a>
+
+<h2 id="实现-createElement-方法"><a href="#实现-createElement-方法" class="headerlink" title="实现 createElement 方法"></a>实现 createElement 方法</h2><p>这个方法平时开发我们并不会用到，因为它是经 babel 编译后的代码，我们新建一个 React 项目，index.js 最简单的代码结构如下：</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> React <span class="keyword">from</span> <span class="string">'react'</span></span><br><span class="line"><span class="keyword">import</span> ReactDOM <span class="keyword">from</span> <span class="string">'react-dom'</span></span><br><span class="line">ReactDOM.render(<span class="xml"><span class="tag">&lt;<span class="name">h1</span> <span class="attr">className</span>=<span class="string">'title'</span>&gt;</span>Hello React<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span>, <span class="built_in">document</span>.getElementById(<span class="string">'root'</span>))</span><br></pre></td></tr></table></figure>
+
+<p>这里就 jsx 会变编译成真正的 DOM ，把 html 代码拿到 babel 官网编译</p>
+<p><img src="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2020/6/6/17287948badb8312?w=1162&h=182&f=png&s=14232" alt=""></p>
+<p>于是我们就看到了 React.createElement() 方法，但这只是调用这个方法，它具体做了什么返回什么我们还不知道，我们可以打印这个函数运行的结果：</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(</span><br><span class="line">  React.createElement(</span><br><span class="line">    <span class="string">'h1'</span>,</span><br><span class="line">    &#123;</span><br><span class="line">      className: <span class="string">'title'</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="string">'Hello React'</span></span><br><span class="line">  )</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2020/6/6/1728796fcf7d2054?w=567&h=181&f=png&s=12796" alt=""><br>返回的这个对象就是虚拟 DOM 了。</p>
+<p>我们来分析它返回的对象参数，首先第一个是</p>
+<ul>
+<li><code>$$typeof: REACT_ELEMENT_TYPE</code></li>
+</ul>
+<p>这个是 React 元素对象的标识属性</p>
+<p>REACT_ELEMENT_TYPE 的值是一个 Symbol 类型，代表了一个独一无二的值。如果浏览器不支持 Symbol 类型，值就是一个二进制值。</p>
+<blockquote>
+<p>为什么是 Symbol？主要防止 XSS 攻击伪造一个假的 React 组件。因为 JSON 中是不会存在 Symbol 类型的。</p>
+</blockquote>
+<ul>
+<li>key：这个比如循环中会用到这个 key 值</li>
+<li>props：传入的属性值，比如 id, className, style, children 等</li>
+<li>ref： DOM 的引用</li>
+<li>剩下的是私有属性（本篇不展开讨论）</li>
+</ul>
+<p>在本篇我们会用自己简单的方式实现这两个方法，而不是根据源码，所以实现上的方法只要能实现它的基本功能即可；有个基本概念在，以后再循序渐进学习源码。</p>
+<p>而 createElement 中有三个参数，更确切说是 n 个参数：</p>
+<ul>
+<li>type：表示要渲染的元素类型。这里可以传入一个元素 Tag 名称，也可以传入一个组件（如 div span 等，也可以是是函数组件和类组件）</li>
+<li>props：创建 React 元素所需要的 props。</li>
+<li>childrens（可选参数）：要渲染元素的子元素，这里可以向后传入 n 个参数。可以为文本字符串，也可以为数组</li>
+</ul>
+<p>初步 createElement 方法：</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 创建 JSX 对象</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">createElement</span>(<span class="params">type, props, ...childrens</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">        type,</span><br><span class="line">        props: &#123;</span><br><span class="line">          ...props,</span><br><span class="line">          children: childrens.length &lt;= <span class="number">1</span> ? childrens[<span class="number">0</span>] || <span class="string">''</span> : childrens,</span><br><span class="line">        &#125;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>参数中 props 和 childrens 是并列关系，然后返回的 props 对象，里面包含了 children，所以我们需要再 props 里面添加 children 参数，然后根据 children 参数为一个或多个的可能在进行取值处理。</p>
+<p>调用该方法：</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(</span><br><span class="line">  createElement(</span><br><span class="line">    <span class="string">'h1'</span>,</span><br><span class="line">    &#123;</span><br><span class="line">      className: <span class="string">'title'</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="string">'Hello React'</span></span><br><span class="line">  )</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2020/6/6/17287aecec9a3e91?w=237&h=116&f=png&s=4860" alt=""><br>除去其它本篇我们不讨论的属性，目前算是实现了一半；我们观察原来 React 自身方法输出的结果有 key, ref， 同输出的 props 也是并列关系，于是我们进一步作出处理</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">createElement</span>(<span class="params">type, props, ...childrens</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> ref, key</span><br><span class="line">  <span class="keyword">if</span> (<span class="string">'ref'</span> <span class="keyword">in</span> props) &#123;</span><br><span class="line">    ref = props[<span class="string">'ref'</span>]</span><br><span class="line">    props[<span class="string">'ref'</span>] = <span class="literal">undefined</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (<span class="string">'key'</span> <span class="keyword">in</span> props) &#123;</span><br><span class="line">    key = props[<span class="string">'key'</span>]</span><br><span class="line">    props[<span class="string">'key'</span>] = <span class="literal">undefined</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> &#123;</span><br><span class="line">    type,</span><br><span class="line">    props: &#123;</span><br><span class="line">      ...props,</span><br><span class="line">      children: childrens.length &lt;= <span class="number">1</span> ? childrens[<span class="number">0</span>] || <span class="string">''</span> : childrens,</span><br><span class="line">    &#125;,</span><br><span class="line">    ref,</span><br><span class="line">    key,</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>同样的方式调用结果如下：</p>
+<p><img src="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2020/6/6/17287b33de749a06?w=453&h=145&f=png&s=8494" alt=""><br>如果添加多一些属性，我们来看看结果</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(</span><br><span class="line">  createElement(</span><br><span class="line">    <span class="string">'div'</span>,</span><br><span class="line">    &#123; <span class="attr">id</span>: <span class="string">'box'</span>, <span class="attr">className</span>: <span class="string">'box'</span>, <span class="attr">style</span>: &#123; <span class="attr">color</span>: <span class="string">'red'</span> &#125;, <span class="attr">key</span>: <span class="string">'20'</span> &#125;,</span><br><span class="line">    <span class="string">'this is text'</span>,</span><br><span class="line">    createElement(<span class="string">'h2'</span>, &#123; <span class="attr">className</span>: <span class="string">'title'</span> &#125;, <span class="string">'hello'</span>),</span><br><span class="line">    createElement(<span class="string">'div'</span>, &#123; <span class="attr">className</span>: <span class="string">'content'</span> &#125;, <span class="string">'Hi'</span>)</span><br><span class="line">  )</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2020/6/6/17287c9de8368ddd?w=467&h=280&f=png&s=17373" alt=""><br>用了这种比较粗鲁的方式添加，设置为 undefined 在实现 render 方法的时候我们会根据这个忽略 props 内部的 key 和 props 属性，这里就实现了最基本的 createElement 方法了。</p>
+<h2 id="实现-render-方法"><a href="#实现-render-方法" class="headerlink" title="实现 render 方法"></a>实现 render 方法</h2><p>render 方法的第一个参数接收的是 createElement 返回的对象，也就是虚拟 DOM；<br>第二个参数则是挂载的目标 DOM。同样的做法，我们用 babel 编译来看：</p>
+<p><img src="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2020/6/6/17287ca773a9b742?w=1259&h=362&f=png&s=43471" alt=""><br>执行后，就被挂在到页面了</p>
+<p><img src="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2020/6/6/17287cc414f3731c?w=343&h=122&f=png&s=6145" alt=""></p>
+<p>实现代码如下：</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * 功能：把创建的对象生成对应的DOM元素，最后插入到页面中</span></span><br><span class="line"><span class="comment"> * objJSX： createElement 返回的 JSX 对象</span></span><br><span class="line"><span class="comment"> * container：挂载的容器，如 document.getElementById('root')</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">render</span>(<span class="params">objJSX, container</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> &#123; type, props &#125; = objJSX</span><br><span class="line">  <span class="keyword">let</span> newElement = <span class="built_in">document</span>.createElement(type)</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> attr <span class="keyword">in</span> props) &#123;</span><br><span class="line">    <span class="comment">// 遍历传入的 props 属性</span></span><br><span class="line">    <span class="keyword">if</span> (!props.hasOwnProperty(attr)) <span class="keyword">break</span> <span class="comment">// 不是私有的直接结束遍历</span></span><br><span class="line">    <span class="keyword">let</span> value = props[attr] <span class="comment">// &gt;如果当前属性没有值,直接不处理即可</span></span><br><span class="line">    <span class="keyword">if</span> (value == <span class="literal">undefined</span>) <span class="keyword">continue</span> <span class="comment">// NULL OR UNDEFINED</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 对几个特殊属性单独设置</span></span><br><span class="line">    <span class="keyword">switch</span> (attr.toUpperCase()) &#123;</span><br><span class="line">      <span class="keyword">case</span> <span class="string">'ID'</span>:</span><br><span class="line">        newElement.setAttribute(<span class="string">'id'</span>, value)</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">      <span class="keyword">case</span> <span class="string">'CLASSNAME'</span>:</span><br><span class="line">        newElement.setAttribute(<span class="string">'class'</span>, value)</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">      <span class="keyword">case</span> <span class="string">'STYLE'</span>: <span class="comment">// 传入的行内样式 style 是个对象，故需遍历赋值</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">let</span> styleAttr <span class="keyword">in</span> value) &#123;</span><br><span class="line">          <span class="keyword">if</span> (value.hasOwnProperty(styleAttr)) &#123;</span><br><span class="line">            newElement[<span class="string">'style'</span>][styleAttr] = value[styleAttr]</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">      <span class="keyword">case</span> <span class="string">'CHILDREN'</span>:</span><br><span class="line">        <span class="comment">/*</span></span><br><span class="line"><span class="comment">         * 可能是一个值：可能是字符串也可能是一个JSX对象</span></span><br><span class="line"><span class="comment">         * 可能是一个数组：数组中的每一项可能是字符串也可能是JSX对象</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        <span class="comment">// 首先把一个值也变为数组，这样后期统一操作数组即可</span></span><br><span class="line">        !(value <span class="keyword">instanceof</span> <span class="built_in">Array</span>) ? (value = [value]) : <span class="literal">null</span></span><br><span class="line">        value.forEach(<span class="function">(<span class="params">item, index</span>) =&gt;</span> &#123;</span><br><span class="line">          <span class="comment">// 验证ITEM是什么类型的：如果是字符串就是创建文本节点，如果是对象，我们需要再次执行RENDER方法，把创建的元素放到最开始创建的大盒子中</span></span><br><span class="line">          <span class="keyword">if</span> (<span class="keyword">typeof</span> item === <span class="string">'string'</span>) &#123;</span><br><span class="line">            <span class="keyword">let</span> text = <span class="built_in">document</span>.createTextNode(item)</span><br><span class="line">            newElement.appendChild(text)</span><br><span class="line">          &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            render(item, newElement)</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;)</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">      <span class="keyword">default</span>:</span><br><span class="line">        newElement.setAttribute(attr, value)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  container.appendChild(newElement)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<br>
+
+<ul>
+<li>ps： <a href="https://images.weserv.nl/?url=https://github.com/Jacky-Summer/personal-blog" target="_blank" rel="noopener">个人技术博文 Github 仓库</a>，觉得不错的话欢迎 star，鼓励我继续写作吧~</li>
+</ul>
+]]></content>
+      <categories>
+        <category>React笔记</category>
+      </categories>
+      <tags>
+        <tag>React</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>理解 redux-thunk 源码</title>
+    <url>/2020/05/30/%E7%90%86%E8%A7%A3-redux-thunk-%E6%BA%90%E7%A0%81/</url>
+    <content><![CDATA[<p>前面几篇我们就 Redux 展开了几篇文章，这次我们来实现 react-thunk，就不是叫实现 redux-thunk 了，直接上源码，因为源码就 11 行。如果对 Redux 中间件还不理解的，可以看我写的 Redux 文章。</p>
+<a id="more"></a>
+
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><ul>
+<li><a href="https://jacky-summer.github.io/2020/04/22/%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA%E8%BF%B7%E4%BD%A0Redux%EF%BC%88%E5%9F%BA%E7%A1%80%E7%89%88%EF%BC%89/#more" target="_blank" rel="noopener">实现一个迷你 Redux（基础版）</a></li>
+<li><a href="https://jacky-summer.github.io/2020/05/14/%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AARedux%EF%BC%88%E5%AE%8C%E5%96%84%E7%89%88%EF%BC%89/#more" target="_blank" rel="noopener">实现一个 Redux（完善版）</a></li>
+<li><a href="https://jacky-summer.github.io/2020/04/28/%E6%B5%85%E8%B0%88React%E7%9A%84Context-API/#more" target="_blank" rel="noopener">浅谈 React 的 Context API</a></li>
+<li><a href="https://jacky-summer.github.io/2020/05/24/%E5%B8%A6%E4%BD%A0%E5%AE%9E%E7%8E%B0-react-redux/" target="_blank" rel="noopener">带你实现 react-redux</a></li>
+</ul>
+<h2 id="为什么要用-redux-thunk"><a href="#为什么要用-redux-thunk" class="headerlink" title="为什么要用 redux-thunk"></a>为什么要用 redux-thunk</h2><p>在使用 Redux 过程，通过 dispatch 方法派发一个 action 对象。当我们使用 redux-thunk 后，可以 dispatch 一个 function。redux-thunk 会自动调用这个 function，并且传递 dispatch, getState 方法作为参数。这样一来，我们就能在这个 function 里面处理异步逻辑，处理复杂逻辑，这是原来 Redux 做不到的，因为原来就只能 dispatch 一个简单对象。</p>
+<h2 id="用法"><a href="#用法" class="headerlink" title="用法"></a>用法</h2><p>redux-thunk 作为 redux 的中间件，主要用来处理异步请求，比如：</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">fetchData</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="function">(<span class="params">dispatch, getState</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// to do ...</span></span><br><span class="line">    axios.get(<span class="string">'https://jsonplaceholder.typicode.com/todos/1'</span>).then(<span class="function"><span class="params">res</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(res)</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="redux-thunk-源码"><a href="#redux-thunk-源码" class="headerlink" title="redux-thunk 源码"></a>redux-thunk 源码</h2><p>redux-thunk 的源码比较简洁，实际就 11 行。前几篇我们说到 redux 的中间件形式，<br>本质上是对 store.dispatch 方法进行了增强改造，基本是类似这种形式：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">const middleware &#x3D; (store) &#x3D;&gt; next &#x3D;&gt; action &#x3D;&gt; &#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这里就不详细解释了，可以看 <a href="https://juejin.im/post/5ebb9375f265da7bfe0bf16a" target="_blank" rel="noopener">实现一个 Redux（完善版）</a></p>
+<p>先给个缩水版的实现：</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> thunk = <span class="function">(<span class="params">&#123; getState, dispatch &#125;</span>) =&gt;</span> <span class="function"><span class="params">next</span> =&gt;</span> <span class="function"><span class="params">action</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> action === <span class="string">'function'</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> action(dispatch, getState)</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> next(action)</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> thunk</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>原理：即当 action 为 function 的时候，就调用这个 function (传入 dispatch, getState)并返回；如果不是，就直接传给下一个中间件。</li>
+</ul>
+<p>完整源码如下：</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">createThunkMiddleware</span>(<span class="params">extraArgument</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="function">(<span class="params">&#123; dispatch, getState &#125;</span>) =&gt;</span> <span class="function"><span class="params">next</span> =&gt;</span> <span class="function"><span class="params">action</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// 如果action是一个function，就返回action(dispatch, getState, extraArgument)，否则返回next(action)。</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">typeof</span> action === <span class="string">'function'</span>) &#123;</span><br><span class="line">      <span class="keyword">return</span> action(dispatch, getState, extraArgument)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// next为之前传入的store.dispatch，即改写前的dispatch</span></span><br><span class="line">    <span class="keyword">return</span> next(action)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> thunk = createThunkMiddleware()</span><br><span class="line"><span class="comment">// 给thunk设置一个变量withExtraArgument，并且将createThunkMiddleware整个函数赋给它</span></span><br><span class="line">thunk.withExtraArgument = createThunkMiddleware</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> thunk</span><br></pre></td></tr></table></figure>
+
+<p>我们发现其实还多了 extraArgument 传入，这个是自定义参数，如下用法：</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> api = <span class="string">'https://jsonplaceholder.typicode.com/todos/1'</span></span><br><span class="line"><span class="keyword">const</span> whatever = <span class="number">10</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> store = createStore(</span><br><span class="line">  reducer,</span><br><span class="line">  applyMiddleware(thunk.withExtraArgument(&#123; api, whatever &#125;))</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment">// later</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">fetchData</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="function">(<span class="params">dispatch, getState, &#123; api, whatever &#125;</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// you can use api and something else here</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>同 redux-thunk 非常流行的库 redux-saga 一样，都是在 redux 中做异步请求等副作用。Redux 相关的系列文章就暂时写到这部分为止，下次会写其他系列。</p>
+<br>
+
+<ul>
+<li>ps： <a href="https://github.com/Jacky-Summer/personal-blog" target="_blank" rel="noopener">个人技术博文 Github 仓库</a>，觉得不错的话欢迎 star，给我一点鼓励继续写作吧~</li>
+</ul>
+]]></content>
+      <categories>
+        <category>React笔记</category>
+      </categories>
+      <tags>
+        <tag>React</tag>
+        <tag>react-thunk</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>带你实现-react-redux</title>
     <url>/2020/05/24/%E5%B8%A6%E4%BD%A0%E5%AE%9E%E7%8E%B0-react-redux/</url>
     <content><![CDATA[<p>之前我们实现了 redux 的功能，这次我们来实现一下配合 redux 开发中经常会用到的一个库—— react-redux。本文不会详细介绍 react-redux 的使用，另外需要了解 Context API， 再看此文就很容易理解了。</p>
@@ -25,7 +143,7 @@
 <figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> React, &#123; Component &#125; <span class="keyword">from</span> <span class="string">'react'</span></span><br><span class="line"><span class="keyword">import</span> &#123; connect &#125; <span class="keyword">from</span> <span class="string">'react-redux'</span></span><br><span class="line"><span class="keyword">import</span> &#123; addNumAction, reduceNumAction &#125; <span class="keyword">from</span> <span class="string">'./redux.js'</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Demo</span> <span class="keyword">extends</span> <span class="title">Component</span> </span>&#123;</span><br><span class="line">  render() &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="keyword">this</span>.props)</span><br><span class="line">    <span class="keyword">return</span> (</span><br><span class="line">      &lt;div&gt;</span><br><span class="line">        &lt;p&gt;&#123;<span class="keyword">this</span>.props.num&#125;&lt;<span class="regexp">/p&gt;</span></span><br><span class="line"><span class="regexp">        &lt;button onClick=&#123;this.props.addNum&#125;&gt;增加1&lt;/</span>button&gt;</span><br><span class="line">        &lt;button onClick=&#123;<span class="keyword">this</span>.props.reduceNum&#125;&gt;减少<span class="number">1</span>&lt;<span class="regexp">/button&gt;</span></span><br><span class="line"><span class="regexp">      &lt;/</span>div&gt;</span><br><span class="line">    )</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> mapStateToProps = <span class="function"><span class="params">state</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> &#123;</span><br><span class="line">    num: state.num,</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> mapDispatchToProps = <span class="function"><span class="params">dispatch</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> &#123;</span><br><span class="line">    addNum() &#123;</span><br><span class="line">      <span class="keyword">const</span> action = addNumAction()</span><br><span class="line">      dispatch(action)</span><br><span class="line">    &#125;,</span><br><span class="line">    reduceNum() &#123;</span><br><span class="line">      <span class="keyword">const</span> action = reduceNumAction()</span><br><span class="line">      dispatch(action)</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> connect(mapStateToProps, mapDispatchToProps)(Demo)</span><br></pre></td></tr></table></figure>
 
 <p>就可以实现 num 的增减：</p>
-<p><img src="https://user-gold-cdn.xitu.io/2020/5/24/172443ab8612774b?w=143&h=82&f=png&s=1764" alt=""><br>其实一个简单的 react-redux， 主要也就是实现 connect 和 Provider 的基本功能</p>
+<p><img src="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2020/5/24/172443ab8612774b?w=143&h=82&f=png&s=1764" alt=""><br>其实一个简单的 react-redux， 主要也就是实现 connect 和 Provider 的基本功能</p>
 <ul>
 <li><strong>connect</strong>：可以把 state 和 dispatch 绑定到 react 组件，使得组件可以访问到 redux 的数据</li>
 <li><strong>Provider</strong>：提供的是一个顶层容器的作用，实现 store 的上下文传递</li>
