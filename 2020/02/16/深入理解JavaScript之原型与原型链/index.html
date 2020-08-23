@@ -22,12 +22,12 @@
     var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Gemini","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true,"b2t":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="对于JavaScript，原型是很重要的一个基础知识点，涉及的内容很多，在此总结一下">
+  <meta name="description" content="对于 JavaScript，原型是很重要的一个基础知识点，涉及的内容很多，在此总结一下">
 <meta property="og:type" content="article">
 <meta property="og:title" content="深入理解JavaScript之原型与原型链">
 <meta property="og:url" content="http://yoursite.com/2020/02/16/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3JavaScript%E4%B9%8B%E5%8E%9F%E5%9E%8B%E4%B8%8E%E5%8E%9F%E5%9E%8B%E9%93%BE/index.html">
 <meta property="og:site_name" content="Jacky">
-<meta property="og:description" content="对于JavaScript，原型是很重要的一个基础知识点，涉及的内容很多，在此总结一下">
+<meta property="og:description" content="对于 JavaScript，原型是很重要的一个基础知识点，涉及的内容很多，在此总结一下">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2020/2/15/17049498b6d308cb?w=885&h=207&f=png&s=21292">
 <meta property="og:image" content="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2020/2/15/17049522bfa417ec?w=866&h=336&f=png&s=32709">
@@ -35,9 +35,10 @@
 <meta property="og:image" content="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2020/2/16/1704bf72a35f1a74?w=861&h=505&f=png&s=54960">
 <meta property="og:image" content="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2020/2/16/1704bffc23da9aaf?w=800&h=592&f=png&s=54550">
 <meta property="article:published_time" content="2020-02-16T01:13:04.000Z">
-<meta property="article:modified_time" content="2020-04-14T12:26:03.418Z">
+<meta property="article:modified_time" content="2020-08-23T08:58:02.713Z">
 <meta property="article:author" content="Jacky Lin">
 <meta property="article:tag" content="JavaScript">
+<meta property="article:tag" content="原型">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2020/2/15/17049498b6d308cb?w=885&h=207&f=png&s=21292">
 
@@ -258,56 +259,63 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>对于JavaScript，原型是很重要的一个基础知识点，涉及的内容很多，在此总结一下</p>
+        <p>对于 JavaScript，原型是很重要的一个基础知识点，涉及的内容很多，在此总结一下</p>
 <a id="more"></a>
-<h2 id="原型prototype"><a href="#原型prototype" class="headerlink" title="原型prototype"></a>原型prototype</h2><p>原型是一个对象，把prototype称为原型对象，prototype可以让所有的对象实例共享它包含的属性和方法。</p>
-<p>JavaScript规定，每一个函数都有一个prototype对象属性，指向另一个对象。prototype对象属性的所有属性和方法都会被构造函数的实例继承。</p>
-<h2 id="只有函数有prototype属性"><a href="#只有函数有prototype属性" class="headerlink" title="只有函数有prototype属性"></a>只有函数有prototype属性</h2><p>js分为函数对象和普通对象，每个对象都有<strong>proto</strong>属性，但是只有函数对象才有prototype属性</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> a = &#123;&#125;</span><br><span class="line"><span class="keyword">let</span> func = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123; &#125;</span><br><span class="line"><span class="built_in">console</span>.log(a.prototype) <span class="comment">// undefined</span></span><br><span class="line"><span class="built_in">console</span>.log(func.prototype) <span class="comment">// &#123; constructor: function()&#123;...&#125; &#125;</span></span><br></pre></td></tr></table></figure>
 
-<p>JS通过new关键字，即靠构造函数生成对象，每次生成的对象都不一样。因为常常需要在两个对象之间共享属性，由于JS在设计之初没有类的概念，所以JS使用函数的prototype属性来处理这部分需要被共享的属性。</p>
-<h2 id="构造函数创建对象"><a href="#构造函数创建对象" class="headerlink" title="构造函数创建对象"></a>构造函数创建对象</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Animal</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">&#125;</span><br><span class="line">Animal.prototype.name = <span class="string">'kiki'</span>;</span><br><span class="line"><span class="keyword">var</span> animal1 = <span class="keyword">new</span> Animal();</span><br><span class="line"><span class="keyword">var</span> animal2 = <span class="keyword">new</span> Animal();</span><br><span class="line"><span class="built_in">console</span>.log(animal1.name, animal2.name) <span class="comment">// kiki kiki</span></span><br></pre></td></tr></table></figure>
-<p>在上述代码中，函数的 prototype 属性指向了一个对象，这个对象正是调用该构造函数而创建的实例的原型，也就是这个例子中的animal1和animal2的原型</p>
-<p>每一个JavaScript对象(null除外)在创建的时候就会与之关联另一个对象，这个对象就是我们所说的原型，每一个对象都会从原型”继承”属性。</p>
+<h2 id="原型-prototype"><a href="#原型-prototype" class="headerlink" title="原型 prototype"></a>原型 prototype</h2><p>原型是一个对象，把 prototype 称为原型对象，prototype 可以让所有的对象实例共享它包含的属性和方法。</p>
+<p>JavaScript 规定，每一个函数都有一个 prototype 对象属性，指向另一个对象。prototype 对象属性的所有属性和方法都会被构造函数的实例继承。</p>
+<h2 id="只有函数有-prototype-属性"><a href="#只有函数有-prototype-属性" class="headerlink" title="只有函数有 prototype 属性"></a>只有函数有 prototype 属性</h2><p>js 分为函数对象和普通对象，每个对象都有<strong>proto</strong>属性，但是只有函数对象才有 prototype 属性</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> a = &#123;&#125;</span><br><span class="line"><span class="keyword">let</span> func = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line"><span class="built_in">console</span>.log(a.prototype) <span class="comment">// undefined</span></span><br><span class="line"><span class="built_in">console</span>.log(func.prototype) <span class="comment">// &#123; constructor: function()&#123;...&#125; &#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>JS 通过 new 关键字，即靠构造函数生成对象，每次生成的对象都不一样。因为常常需要在两个对象之间共享属性，由于 JS 在设计之初没有类的概念，所以 JS 使用函数的 prototype 属性来处理这部分需要被共享的属性。</p>
+<h2 id="构造函数创建对象"><a href="#构造函数创建对象" class="headerlink" title="构造函数创建对象"></a>构造函数创建对象</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Animal</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line">Animal.prototype.name = <span class="string">'kiki'</span></span><br><span class="line"><span class="keyword">var</span> animal1 = <span class="keyword">new</span> Animal()</span><br><span class="line"><span class="keyword">var</span> animal2 = <span class="keyword">new</span> Animal()</span><br><span class="line"><span class="built_in">console</span>.log(animal1.name, animal2.name) <span class="comment">// kiki kiki</span></span><br></pre></td></tr></table></figure>
+
+<p>在上述代码中，函数的 prototype 属性指向了一个对象，这个对象正是调用该构造函数而创建的实例的原型，也就是这个例子中的 animal1 和 animal2 的原型</p>
+<p>每一个 JavaScript 对象(null 除外)在创建的时候就会与之关联另一个对象，这个对象就是我们所说的原型，每一个对象都会从原型”继承”属性。</p>
 <p>构造函数和实例原型关系如下图：</p>
 <p><img src="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2020/2/15/17049498b6d308cb?w=885&h=207&f=png&s=21292" alt=""></p>
 <h2 id="proto"><a href="#proto" class="headerlink" title="proto"></a><strong>proto</strong></h2><p>那么如何表示实例与实例原型之间的关系呢，这里需要讲到另一个属性<strong>proto</strong></p>
-<p>每一个JavaScript对象(除了 null)都具有的一个属性，叫<strong>proto</strong>，这个属性会指向该对象的原型</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Animal</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> dog = <span class="keyword">new</span> Animal();</span><br><span class="line"><span class="built_in">console</span>.log(dog.__proto__ === Animal.prototype); <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+<p>每一个 JavaScript 对象(除了 null)都具有的一个属性，叫<strong>proto</strong>，这个属性会指向该对象的原型</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Animal</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> dog = <span class="keyword">new</span> Animal()</span><br><span class="line"><span class="built_in">console</span>.log(dog.__proto__ === Animal.prototype) <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+
 <p>于是更新实例与实例原型之间的关系如下图：</p>
 <p><img src="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2020/2/15/17049522bfa417ec?w=866&h=336&f=png&s=32709" alt=""></p>
-<h2 id="constructor-NaN"><a href="#constructor-NaN" class="headerlink" title="constructor"></a>constructor</h2><p>每个原型都有一个constructor属性指向关联的构造函数</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Animal</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">console</span>.log(Animal === Animal.prototype.constructor); <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+<h2 id="constructor-NaN"><a href="#constructor-NaN" class="headerlink" title="constructor"></a>constructor</h2><p>每个原型都有一个 constructor 属性指向关联的构造函数</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Animal</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line"><span class="built_in">console</span>.log(Animal === Animal.prototype.constructor) <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+
 <p><img src="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2020/2/15/170496796080e487?w=849&h=347&f=png&s=35480" alt=""></p>
 <p>则可以得出：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Animal</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> dog = <span class="keyword">new</span> Animal();</span><br><span class="line"><span class="built_in">console</span>.log(dog.__proto__ === Animal.prototype) <span class="comment">// true</span></span><br><span class="line"><span class="comment">// Object.getPrototypeOf() 方法返回指定对象的原型</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Object</span>.getPrototypeOf(dog) === Animal.prototype) <span class="comment">// true</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(Animal.prototype.constructor == Animal) <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Animal</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line"><span class="keyword">var</span> dog = <span class="keyword">new</span> Animal()</span><br><span class="line"><span class="built_in">console</span>.log(dog.__proto__ === Animal.prototype) <span class="comment">// true</span></span><br><span class="line"><span class="comment">// Object.getPrototypeOf() 方法返回指定对象的原型</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Object</span>.getPrototypeOf(dog) === Animal.prototype) <span class="comment">// true</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(Animal.prototype.constructor == Animal) <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+
 <p>再提一点：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Animal</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> dog = <span class="keyword">new</span> Animal();</span><br><span class="line"><span class="built_in">console</span>.log(dog.constructor === Animal); <span class="comment">// true</span></span><br><span class="line"><span class="comment">/* 当获取 dog.constructor 时，其实 dog 中并没有 constructor 属性,</span></span><br><span class="line"><span class="comment">当不能读取到constructor 属性时，</span></span><br><span class="line"><span class="comment">会从 dog 的原型也就是 Animal.prototype 中读取，正好原型中有该属性, 所以下列代码为true */</span></span><br><span class="line">dog.constructor === Animal.prototype.constructor</span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Animal</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line"><span class="keyword">var</span> dog = <span class="keyword">new</span> Animal()</span><br><span class="line"><span class="built_in">console</span>.log(dog.constructor === Animal) <span class="comment">// true</span></span><br><span class="line"><span class="comment">/* 当获取 dog.constructor 时，其实 dog 中并没有 constructor 属性,</span></span><br><span class="line"><span class="comment">当不能读取到constructor 属性时，</span></span><br><span class="line"><span class="comment">会从 dog 的原型也就是 Animal.prototype 中读取，正好原型中有该属性, 所以下列代码为true */</span></span><br><span class="line">dog.constructor === Animal.prototype.constructor</span><br></pre></td></tr></table></figure>
 
 <h2 id="实例和原型"><a href="#实例和原型" class="headerlink" title="实例和原型"></a>实例和原型</h2><p>当读取实例的属性时，如果找不到，就会查找与对象关联的原型中的属性，如果还查不到，就去找原型的原型，一直找到最顶层为止。</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Animal</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Animal.prototype.name = <span class="string">'kiki'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> dog = <span class="keyword">new</span> Animal();</span><br><span class="line"></span><br><span class="line">dog.name = <span class="string">'xiaobai'</span>;</span><br><span class="line"><span class="built_in">console</span>.log(dog.name) <span class="comment">// xiaobai</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">delete</span> dog.name;</span><br><span class="line"><span class="built_in">console</span>.log(dog.name) <span class="comment">// kiki</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Animal</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">Animal.prototype.name = <span class="string">'kiki'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> dog = <span class="keyword">new</span> Animal()</span><br><span class="line"></span><br><span class="line">dog.name = <span class="string">'xiaobai'</span></span><br><span class="line"><span class="built_in">console</span>.log(dog.name) <span class="comment">// xiaobai</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">delete</span> dog.name</span><br><span class="line"><span class="built_in">console</span>.log(dog.name) <span class="comment">// kiki</span></span><br></pre></td></tr></table></figure>
 
-<p>上述代码。首先构造函数原型设置了 name值，接着dog实例添加了name属性，覆盖原型的name值，打印dog.name时结果自然是xiaobai。</p>
-<p>当删除了dog的name属性时，读取dog.name时，从对象中无法找到name属性，就会从dog的原型，也就是dog.<strong>proto</strong>，即Animal.prototype中查找，找到结果为kiki。</p>
-<p>如果原型没有设置name值，找不到呢？原型的原型又是谁？</p>
+<p>上述代码。首先构造函数原型设置了 name 值，接着 dog 实例添加了 name 属性，覆盖原型的 name 值，打印 dog.name 时结果自然是 xiaobai。</p>
+<p>当删除了 dog 的 name 属性时，读取 dog.name 时，从对象中无法找到 name 属性，就会从 dog 的原型，也就是 dog.<strong>proto</strong>，即 Animal.prototype 中查找，找到结果为 kiki。</p>
+<p>如果原型没有设置 name 值，找不到呢？原型的原型又是谁？</p>
 <h2 id="原型的原型"><a href="#原型的原型" class="headerlink" title="原型的原型"></a>原型的原型</h2><p>原型本身也是一个对象，既然是对象，我们就可以用最原始的方式创建它：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj = <span class="keyword">new</span> <span class="built_in">Object</span>();</span><br><span class="line">obj.name = <span class="string">'kiki'</span></span><br><span class="line"><span class="built_in">console</span>.log(obj.name) <span class="comment">// kiki</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj = <span class="keyword">new</span> <span class="built_in">Object</span>()</span><br><span class="line">obj.name = <span class="string">'kiki'</span></span><br><span class="line"><span class="built_in">console</span>.log(obj.name) <span class="comment">// kiki</span></span><br></pre></td></tr></table></figure>
+
 <p>其实原型对象就是通过 Object 构造函数生成的，所有函数的 默认原型 都是 Object 的实例，因此默认原型都会包含一个内部指针，指向 Object.prototype。</p>
 <p>由此，更新关系图：</p>
 <p><img src="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2020/2/16/1704bf72a35f1a74?w=861&h=505&f=png&s=54960" alt=""></p>
 <h2 id="原型链"><a href="#原型链" class="headerlink" title="原型链"></a>原型链</h2><ol>
-<li>每个对象都拥有一个原型对象: dog的原型是Animal.prototype。</li>
-<li>对象的原型可能也是继承其他原型对象的: Animal.prototype也有它的原型Object.prototype。</li>
+<li>每个对象都拥有一个原型对象: dog 的原型是 Animal.prototype。</li>
+<li>对象的原型可能也是继承其他原型对象的: Animal.prototype 也有它的原型 Object.prototype。</li>
 <li>一层一层的，以此类推，这种关系就是原型链。</li>
 </ol>
 <p>那么<code>Object.prototype</code>的原型是什么呢？</p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Object</span>.prototype.__proto__ === <span class="literal">null</span>) <span class="comment">// true</span></span><br><span class="line"><span class="keyword">const</span> proto = <span class="built_in">Object</span>.getPrototypeOf(<span class="built_in">Object</span>.prototype) <span class="comment">// null</span></span><br></pre></td></tr></table></figure>
+
 <p>所以 Object.prototype.<strong>proto</strong> 的值为 null 跟 Object.prototype 没有原型，其实表达了一个意思。null 表示此处不应该有值，也就是原型链的终点了，所以查找属性的时候查到 Object.prototype 就可以停止查找了。</p>
 <p><img src="https://images.weserv.nl/?url=https://user-gold-cdn.xitu.io/2020/2/16/1704bffc23da9aaf?w=800&h=592&f=png&s=54550" alt=""></p>
 <p>上图中的红色线组成的链就可以称之为原型链。</p>
 <p>由上述关系图我们可以重新描述一下原型链：</p>
 <blockquote>
-<p>从一个实例对象开始往上找，这个实例对象的<strong>proto</strong>属性所指向的则是这个实例对象的原型对象，如果用dog表示这个实例，则原型对象表示为<code>dog.__proto__</code>。同时，这个原型也是一个对象，而且它也有上一级的原型对象，相对于上一级原型对象而言，它也是一个实例对象，那么它也拥有<strong>proto</strong>属性，它的<strong>proto</strong>属性也指向它的原型对象，后面也以此类推，一直到Object.prototype这个原型为止，这就是整个原型链。</p>
+<p>从一个实例对象开始往上找，这个实例对象的<strong>proto</strong>属性所指向的则是这个实例对象的原型对象，如果用 dog 表示这个实例，则原型对象表示为<code>dog.__proto__</code>。同时，这个原型也是一个对象，而且它也有上一级的原型对象，相对于上一级原型对象而言，它也是一个实例对象，那么它也拥有<strong>proto</strong>属性，它的<strong>proto</strong>属性也指向它的原型对象，后面也以此类推，一直到 Object.prototype 这个原型为止，这就是整个原型链。</p>
 </blockquote>
 
     </div>
@@ -328,6 +336,7 @@
       <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/JavaScript/" rel="tag"><i class="fa fa-tag"></i> JavaScript</a>
+              <a href="/tags/%E5%8E%9F%E5%9E%8B/" rel="tag"><i class="fa fa-tag"></i> 原型</a>
           </div>
 
         
@@ -402,7 +411,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#原型prototype"><span class="nav-number">1.</span> <span class="nav-text">原型prototype</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#只有函数有prototype属性"><span class="nav-number">2.</span> <span class="nav-text">只有函数有prototype属性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#构造函数创建对象"><span class="nav-number">3.</span> <span class="nav-text">构造函数创建对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#proto"><span class="nav-number">4.</span> <span class="nav-text">proto</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#constructor-NaN"><span class="nav-number">5.</span> <span class="nav-text">constructor</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实例和原型"><span class="nav-number">6.</span> <span class="nav-text">实例和原型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#原型的原型"><span class="nav-number">7.</span> <span class="nav-text">原型的原型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#原型链"><span class="nav-number">8.</span> <span class="nav-text">原型链</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#原型-prototype"><span class="nav-number">1.</span> <span class="nav-text">原型 prototype</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#只有函数有-prototype-属性"><span class="nav-number">2.</span> <span class="nav-text">只有函数有 prototype 属性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#构造函数创建对象"><span class="nav-number">3.</span> <span class="nav-text">构造函数创建对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#proto"><span class="nav-number">4.</span> <span class="nav-text">proto</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#constructor-NaN"><span class="nav-number">5.</span> <span class="nav-text">constructor</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实例和原型"><span class="nav-number">6.</span> <span class="nav-text">实例和原型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#原型的原型"><span class="nav-number">7.</span> <span class="nav-text">原型的原型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#原型链"><span class="nav-number">8.</span> <span class="nav-text">原型链</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -431,7 +440,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-count">36</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -479,7 +488,7 @@
 -->
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共79.4k字</span>
+  <span class="post-count">博客全站共79.5k字</span>
 </div>
 
         
