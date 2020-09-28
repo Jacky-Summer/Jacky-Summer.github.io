@@ -1,8 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>手写防抖与节流函数</title>
+    <url>/2020/09/28/%E6%89%8B%E5%86%99%E9%98%B2%E6%8A%96%E4%B8%8E%E8%8A%82%E6%B5%81%E5%87%BD%E6%95%B0/</url>
+    <content><![CDATA[<p>函数防抖与节流算是前端性能优化的一个细节点，可能开发大多数是用着 JS 库顺带的防抖节流函数，但我们必须会自己写因为没有必要因为一个函数引入一个库。</p>
+<a id="more"></a>
+
+<h2 id="防抖与节流效果"><a href="#防抖与节流效果" class="headerlink" title="防抖与节流效果"></a>防抖与节流效果</h2><p>这是别人做的一个动画，很容易就能理解区别：<a href="http://demo.nimius.net/debounce_throttle/" target="_blank" rel="noopener">防抖与节流</a></p>
+<h2 id="函数防抖-debounce"><a href="#函数防抖-debounce" class="headerlink" title="函数防抖(debounce)"></a>函数防抖(debounce)</h2><blockquote>
+<p>在事件被触发 n 秒后再执行回调，如果在这 n 秒内又被触发，则重新计时。</p>
+</blockquote>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">debounce</span>(<span class="params">func, wait, immediate</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> timeout</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">debounced</span>(<span class="params">...args</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">const</span> ctx = <span class="keyword">this</span></span><br><span class="line">    <span class="keyword">if</span> (timeout) clearTimeout(timeout) <span class="comment">// 每次调用debounce函数都会将前一次的timer清空，确保只执行一次</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (immediate) &#123;</span><br><span class="line">      <span class="keyword">const</span> callNow = !timeout</span><br><span class="line">      timeout = setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="comment">// 这里只有在 wait 时长之后，timeout 为 null，然后触发防抖函数才能立即执行，</span></span><br><span class="line">        <span class="comment">// 否则 callNow 为 false，不会立即执行，计时器会重新计时</span></span><br><span class="line">        timeout = <span class="literal">null</span></span><br><span class="line">      &#125;, wait)</span><br><span class="line">      <span class="keyword">if</span> (callNow) func.apply(ctx, args)</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      timeout = setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">        func.apply(ctx, args)</span><br><span class="line">      &#125;, wait)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  debounced.cancel = <span class="function"><span class="keyword">function</span> <span class="title">cancel</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">// 取消功能</span></span><br><span class="line">    clearTimeout(timeout)</span><br><span class="line">    timeout = <span class="literal">null</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> debounced</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h3><p>适合多次事件一次响应的情况</p>
+<ul>
+<li>search 搜索联想，用户在不断输入值进行 AJAX 验证时时，用防抖来节约请求资源。</li>
+<li>按钮点击事件/input 事件，防止用户多次重复提交</li>
+<li>电话号码输入的验证， 只需停止输入后进行一次。</li>
+</ul>
+<h2 id="函数节流-throttle"><a href="#函数节流-throttle" class="headerlink" title="函数节流(throttle)"></a>函数节流(throttle)</h2><blockquote>
+<p>规定一个单位时间，在这个单位时间内，只能有一次触发事件的回调函数执行，如果在同一个单位时间内某事件被触发多次，只有一次能生效。</p>
+</blockquote>
+<h3 id="定时器版"><a href="#定时器版" class="headerlink" title="定时器版"></a>定时器版</h3><figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">throttle</span>(<span class="params">func, wait</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> timeout = <span class="number">0</span></span><br><span class="line">  <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> <span class="title">throttled</span>(<span class="params">...args</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">const</span> ctx = <span class="keyword">this</span></span><br><span class="line">    <span class="keyword">if</span> (!timeout) &#123;</span><br><span class="line">      timeout = setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">        func.apply(ctx, args)</span><br><span class="line">        timeout = <span class="literal">null</span></span><br><span class="line">      &#125;, wait)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="时间戳节流"><a href="#时间戳节流" class="headerlink" title="时间戳节流"></a>时间戳节流</h3><figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">throttle</span>(<span class="params">func, wait</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> previous = <span class="number">0</span></span><br><span class="line">  <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> <span class="title">throttled</span>(<span class="params">...args</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">const</span> ctx = <span class="keyword">this</span></span><br><span class="line">    <span class="keyword">const</span> now = <span class="built_in">Date</span>.now()</span><br><span class="line">    <span class="keyword">const</span> remain = wait - (now - previous)</span><br><span class="line">    <span class="keyword">if</span> (remain &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">      func.apply(ctx, args)</span><br><span class="line">      previous = now</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="应用场景-1"><a href="#应用场景-1" class="headerlink" title="应用场景"></a>应用场景</h3><p>适合大量事件按时间做平均分配触发。</p>
+<ul>
+<li>监听滚动或 resize 事件，比如是否滑到底部自动加载更多，调整窗口大小用 throttle 来判断</li>
+<li>DOM 元素拖拽</li>
+<li>自动保存草稿功能，当用户在输入的时候(一直触发事件),单位时间内只保存一次草稿</li>
+<li>Canvas 画笔功能</li>
+<li>游戏中的刷新率</li>
+</ul>
+]]></content>
+      <categories>
+        <category>日常总结</category>
+      </categories>
+      <tags>
+        <tag>JavaScript</tag>
+        <tag>手写</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>动手搞懂 HTTP 缓存机制</title>
-    <url>/2020/09/28/%E5%8A%A8%E6%89%8B%E6%90%9E%E6%87%82-HTTP-%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6/</url>
+    <url>/2020/09/27/%E5%8A%A8%E6%89%8B%E6%90%9E%E6%87%82-HTTP-%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6/</url>
     <content><![CDATA[<p>HTTP 缓存策略相信大家都有一定的了解，但自己讲的话也是大概模糊的理解。于是，又回到重新归纳的环节了，这次，搞懂它！</p>
 <a id="more"></a>
 
