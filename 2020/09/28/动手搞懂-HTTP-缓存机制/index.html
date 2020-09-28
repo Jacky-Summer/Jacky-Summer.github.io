@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon_32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon_16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/pace-js@1.0.2/themes/blue/pace-theme-center-atom.css">
+  <script src="//cdn.jsdelivr.net/npm/pace-js@1/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Gemini","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true,"b2t":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="HTTP 缓存策略相信大家都有一定的了解，但自己讲的话也是大概模糊的理解。于是，又回到重新归纳的环节了，这次，搞懂它！">
+<meta property="og:type" content="article">
+<meta property="og:title" content="动手搞懂 HTTP 缓存机制">
+<meta property="og:url" content="http://yoursite.com/2020/09/28/%E5%8A%A8%E6%89%8B%E6%90%9E%E6%87%82-HTTP-%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6/index.html">
+<meta property="og:site_name" content="JackySummer">
+<meta property="og:description" content="HTTP 缓存策略相信大家都有一定的了解，但自己讲的话也是大概模糊的理解。于是，又回到重新归纳的环节了，这次，搞懂它！">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/fa0b4111b21043629107fb09c50533d8~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/184fe17b6c1444b58214d8d20e33b1e5~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:image" content="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/60cdeeb8bdd34665975bfe90f0a8cd0a~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/c6b694c980734c649458db32c5966846~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:image" content="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/387b188f62744390a631aecb9cb96aa9~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:image" content="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/8ae57f2487a241d799dcb136b16854cc~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:image" content="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/06e9be1e391a48a9841242a0fdc3a4e6~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:image" content="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/d8a2199d885748ee88b6023b7c4f8b5b~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:image" content="https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/78b4c599e5894dcd8b2505cc410de2f5~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="article:published_time" content="2020-09-28T01:12:02.000Z">
+<meta property="article:modified_time" content="2020-09-28T01:12:57.998Z">
+<meta property="article:author" content="Jacky Lin">
+<meta property="article:tag" content="HTTP">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/fa0b4111b21043629107fb09c50533d8~tplv-k3u1fbpfcp-zoom-1.image">
+
+<link rel="canonical" href="http://yoursite.com/2020/09/28/%E5%8A%A8%E6%89%8B%E6%90%9E%E6%87%82-HTTP-%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>动手搞懂 HTTP 缓存机制 | JackySummer</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">JackySummer</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="search-pop-overlay">
+  <div class="popup search-popup">
+      <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+  </div>
+</div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/09/28/%E5%8A%A8%E6%89%8B%E6%90%9E%E6%87%82-HTTP-%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Jacky Lin">
+      <meta itemprop="description" content="一个热爱技术，乐于分享的前端er">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JackySummer">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          动手搞懂 HTTP 缓存机制
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-09-28 09:12:02" itemprop="dateCreated datePublished" datetime="2020-09-28T09:12:02+08:00">2020-09-28</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/HTTP%E7%B3%BB%E5%88%97/" itemprop="url" rel="index"><span itemprop="name">HTTP系列</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>5.9k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>5 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>HTTP 缓存策略相信大家都有一定的了解，但自己讲的话也是大概模糊的理解。于是，又回到重新归纳的环节了，这次，搞懂它！</p>
+<a id="more"></a>
+
+<h2 id="浏览器缓存的作用"><a href="#浏览器缓存的作用" class="headerlink" title="浏览器缓存的作用"></a>浏览器缓存的作用</h2><ol>
+<li>缓存可以减少冗余的数据传输，节省了网络带宽，从而更快的加载页面以及减少用户的流量消耗</li>
+<li>缓存降低了服务器的要求，从而让服务器更快的响应。</li>
+</ol>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>浏览器缓存策略分为两种：<strong>强缓存</strong>和<strong>协商缓存</strong>。一看到强缓存，就可能联想到”弱缓存”，这个”强”实际形容得不太恰当，其实强缓存指的是新鲜的响应，而协商缓存指的是陈旧的响应（已过期），而要复用陈旧的响应就得使用条件请求（If-xxx）进行缓存验证，我们下面会讲。</p>
+<h2 id="基本原理"><a href="#基本原理" class="headerlink" title="基本原理"></a>基本原理</h2><ol>
+<li>浏览器在加载资源时，根据请求头的 Expires 和 Cache-Control 判断是否命中强缓存，是则直接从缓存读取资源，不会发请求到服务器。</li>
+<li>如果没有命中强缓存，浏览器一定会发送一个请求到服务器，通过 Last-Modified 和 ETag 验证资源是否命中协商缓存，如果命中，则返回 304 读取缓存资源</li>
+<li>如果前面两者都没有命中，直接从服务器请求加载资源</li>
+</ol>
+<h2 id="缓存的文件到哪里去"><a href="#缓存的文件到哪里去" class="headerlink" title="缓存的文件到哪里去"></a>缓存的文件到哪里去</h2><p>一般看到的两种：memory cache（内存缓存） 和 disk cache（硬盘缓存）</p>
+<ul>
+<li><p><strong>200 from memory cache</strong>：它是将资源文件缓存到内存中，而是直接从内存中读取数据。但该方式退出进程时数据会被清除，如关闭浏览器；一般会将将脚本、字体、图片会存储到内存缓存中。</p>
+</li>
+<li><p><strong>200 from disk cache</strong>：它是将资源文件缓存到硬盘中。关闭浏览器后，数据依然存在；一般会将非脚本的存放在硬盘中，比如 css。</p>
+</li>
+</ul>
+<p>优先访问 memory cache，其次是 disk cache，最后是请求网络资源；且内存读取速度比硬盘读取速度快，但也不能把所有数据放在内存中，因为内存也是有限的。</p>
+<h2 id="通过-express-搭建服务模拟演示"><a href="#通过-express-搭建服务模拟演示" class="headerlink" title="通过 express 搭建服务模拟演示"></a>通过 express 搭建服务模拟演示</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">'path'</span>)</span><br><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">'fs'</span>)</span><br><span class="line"><span class="keyword">const</span> express = <span class="built_in">require</span>(<span class="string">'express'</span>)</span><br><span class="line"><span class="keyword">const</span> app = express()</span><br><span class="line"></span><br><span class="line">app.get(<span class="string">'/'</span>, (req, res) =&gt; &#123;</span><br><span class="line">  res.send(<span class="string">`&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="string">  &lt;html lang="en"&gt;</span></span><br><span class="line"><span class="string">  &lt;head&gt;</span></span><br><span class="line"><span class="string">    &lt;meta charset="UTF-8"&gt;</span></span><br><span class="line"><span class="string">    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</span></span><br><span class="line"><span class="string">    &lt;title&gt;Init Demo&lt;/title&gt;</span></span><br><span class="line"><span class="string">  &lt;/head&gt;</span></span><br><span class="line"><span class="string">  &lt;body&gt;</span></span><br><span class="line"><span class="string">    Hello Init Demo</span></span><br><span class="line"><span class="string">    &lt;script src="/test.js"&gt;&lt;/script&gt;</span></span><br><span class="line"><span class="string">  &lt;/body&gt;</span></span><br><span class="line"><span class="string">  &lt;/html&gt;`</span>)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">app.get(<span class="string">'/test.js'</span>, (req, res) =&gt; &#123;</span><br><span class="line">  <span class="keyword">let</span> sourcePath = path.resolve(__dirname, <span class="string">'../public/test.js'</span>)</span><br><span class="line">  <span class="keyword">let</span> result = fs.readFileSync(sourcePath)</span><br><span class="line">  res.end(result)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">app.listen(<span class="number">3000</span>, () =&gt; &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'listening on 3000'</span>)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>如上代码，当进入<code>http://localhost:3000/</code>，请求过程如下：</p>
+<ul>
+<li>浏览器请求静态资源 <code>test.js</code></li>
+<li>服务器读取磁盘文件 <code>test.js</code>，返回给浏览器</li>
+<li>浏览器再次请求，服务器又重新读取磁盘文件 <code>test.js</code>，返给浏览器。</li>
+</ul>
+<p>多次刷新网页，重新进入，可以看到每次都重新发了<code>test.js</code>的请求，这种方式下没有进行任何缓存。</p>
+<p><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/fa0b4111b21043629107fb09c50533d8~tplv-k3u1fbpfcp-zoom-1.image" alt=""></p>
+<h2 id="强缓存"><a href="#强缓存" class="headerlink" title="强缓存"></a>强缓存</h2><p>强缓存通过 Expires 和 Cache-Control 两种响应头实现</p>
+<p>原理：</p>
+<blockquote>
+<p>浏览器在加载资源的时候，会先根据本地缓存资源的 header 中的信息(Expires 和 Cache-Control)来判断是否需要强制缓存。如果命中的话，则会直接使用缓存中的资源。否则的话，会继续向服务器发送请求。</p>
+</blockquote>
+<h3 id="Expires"><a href="#Expires" class="headerlink" title="Expires"></a>Expires</h3><p>Expires 是 HTTP1.0 的规范，表示该资源过期时间，它描述的是一个绝对时间（值为 GMT 时间，即格林尼治时间），由服务器返回。</p>
+<p>如果浏览器端当前时间小于过期时间，则直接使用缓存数据。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">app.get(<span class="string">'/test.js'</span>, (req, res) =&gt; &#123;</span><br><span class="line">  <span class="keyword">let</span> sourcePath = path.resolve(__dirname, <span class="string">'../public/test.js'</span>)</span><br><span class="line">  <span class="keyword">let</span> result = fs.readFileSync(sourcePath)</span><br><span class="line">  res.setHeader(</span><br><span class="line">    <span class="string">'Expires'</span>,</span><br><span class="line">    moment().utc().add(<span class="number">1</span>, <span class="string">'m'</span>).format(<span class="string">'ddd, DD MMM YYYY HH:mm:ss'</span>) + <span class="string">' GMT'</span> <span class="comment">// 设置1分钟后过期</span></span><br><span class="line">  )</span><br><span class="line">  res.end(result)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>上面代码我们添加了 Expires 响应头，第一次向服务器发起请求后，同时返回过期时间和文件；当再次刷新时，就会看到文件是直接从缓存(memory cache)中读取的；当 1 分钟过后过期了，又会重新请求了。</p>
+<p><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/184fe17b6c1444b58214d8d20e33b1e5~tplv-k3u1fbpfcp-zoom-1.image" alt=""></p>
+<p>这种方式受限于本地时间，服务器的时间和客户端的时间不一样的情况下（比如浏览器设置了很后的时间，则一直处于过期状态），可能会造成缓存失效。而且过期后，不管文件有没有发生变化，服务器都会再次读取文件返回给浏览器。</p>
+<p>Expires 是 HTTP 1.0 的东西，现在默认浏览器大部分使用 HTTP 1.1，它的作用基本忽略，因为会靠<code>Cache-Control</code>作为主要判断依据。</p>
+<h3 id="Cache-Control"><a href="#Cache-Control" class="headerlink" title="Cache-Control"></a>Cache-Control</h3><p>知道了 <code>Expires</code>的缺点后，在 HTTP 1.1 版开始，就加入了<code>Cache-Control</code>来替代，它是利用<code>max-age</code>判断缓存时间的，以秒为单位，它的优先级高于 <code>Expires</code>，表示的是相对时间。也就是说，如果<code>max-age</code>和<code>Expires</code>同时存在，则被 Cache-Control 的 max-age 覆盖。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">app.get(<span class="string">'/test.js'</span>, (req, res) =&gt; &#123;</span><br><span class="line">  <span class="keyword">let</span> sourcePath = path.resolve(__dirname, <span class="string">'../public/test.js'</span>)</span><br><span class="line">  <span class="keyword">let</span> result = fs.readFileSync(sourcePath)</span><br><span class="line">  res.setHeader(<span class="string">'Cache-Control'</span>, <span class="string">'max-age=60'</span>) <span class="comment">// 设置相对时间-60秒过期</span></span><br><span class="line">  res.end(result)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>同样第一次请求后再次请求，就可以看到是命中协商缓存了。<br><img src="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/60cdeeb8bdd34665975bfe90f0a8cd0a~tplv-k3u1fbpfcp-zoom-1.image" alt=""></p>
+<p>除了该字段，还有其他字段可设置：</p>
+<h4 id="public"><a href="#public" class="headerlink" title="public"></a>public</h4><p>表示可以被浏览器和代理服务器缓存，代理服务器一般可用 nginx 来做</p>
+<h4 id="private"><a href="#private" class="headerlink" title="private"></a>private</h4><p>只让客户端可以缓存该资源；代理服务器不缓存</p>
+<h4 id="no-cache"><a href="#no-cache" class="headerlink" title="no-cache"></a>no-cache</h4><p>跳过设置强缓存，但是不妨碍设置协商缓存；一般如果你做了强缓存，只有在强缓存失效了才走协商缓存的，设置了 no-cache 就不会走强缓存了，每次请求都回询问服务端。</p>
+<h4 id="no-store"><a href="#no-store" class="headerlink" title="no-store"></a>no-store</h4><p>禁止使用缓存，每一次都要重新请求数据。</p>
+<p>比如我设置禁止缓存，再重复上面操作，就每次都向服务器请求了</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">res.setHeader(<span class="string">'Cache-Control'</span>, <span class="string">'no-store, max-age=60'</span>) <span class="comment">// 禁止缓存</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/c6b694c980734c649458db32c5966846~tplv-k3u1fbpfcp-zoom-1.image" alt=""></p>
+<h2 id="协商缓存"><a href="#协商缓存" class="headerlink" title="协商缓存"></a>协商缓存</h2><p>强缓存的缺点就是每次都根据时间来判断是否过期，但如果到了过期时间后，文件没有改动，再次去获取就有点浪费服务器的资源了，因此有了协商缓存。</p>
+<p>当浏览器对某个资源的请求没有命中强缓存，就会发一个请求到服务器，验证协商缓存是否命中，如果协商缓存命中，请求响应返回的 http 状态为 304 告诉浏览器读取换出，并且会显示一个 Not Modified 的字符串；如果未命中，则返回请求的资源。</p>
+<p>协商缓存是利用的是<code>Last-Modified/If-Modified-Since</code>和<code>ETag/If-None-Match</code>这两对标识来管理的</p>
+<p>原理：</p>
+<blockquote>
+<p>客户端向服务器端发出请求，服务端会检测是否有对应的标识，如果没有对应的标识，服务器端会返回一个对应的标识给客户端，客户端下次再次请求的时候，把该标识带过去，然后服务器端会验证该标识，如果验证通过了，则会响应 304，告诉浏览器读取缓存。如果标识没有通过，则返回请求的资源。</p>
+</blockquote>
+<h3 id="Last-Modified"><a href="#Last-Modified" class="headerlink" title="Last-Modified"></a>Last-Modified</h3><p>过程如下：</p>
+<ul>
+<li>浏览器请求资源，服务器每次返回文件的同时，返回<code>Last-Modified</code>(最后的修改时间)到 Header 中</li>
+<li>当浏览器的缓存文件过期后，浏览器带上请求头<code>If-Modified-Since</code>（值为上一次的<code>Last-Modified</code>）请求服务器</li>
+<li>服务器比较请求头的<code>If-Modified-Since</code>和文件上次修改时间一样，则命中缓存返回 304；如果不一致就返回 200 响应和文件的内容还有更新<code>Last-Modified</code>的值，以此往复。</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">app.get(<span class="string">'/test.js'</span>, (req, res) =&gt; &#123;</span><br><span class="line">  <span class="keyword">let</span> sourcePath = path.resolve(__dirname, <span class="string">'../public/test.js'</span>)</span><br><span class="line">  <span class="keyword">let</span> result = fs.readFileSync(sourcePath)</span><br><span class="line">  <span class="keyword">let</span> status = fs.statSync(sourcePath)</span><br><span class="line">  <span class="keyword">let</span> lastModified = status.mtime.toUTCString()</span><br><span class="line">  <span class="keyword">if</span> (lastModified === req.headers[<span class="string">'if-modified-since'</span>]) &#123;</span><br><span class="line">    res.writeHead(<span class="number">304</span>, <span class="string">'Not Modified'</span>)</span><br><span class="line">    res.end()</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    res.setHeader(<span class="string">'Cache-Control'</span>, <span class="string">'max-age=1'</span>) <span class="comment">// 设置1秒后过期以方便我们马上能用Last-Modified判断</span></span><br><span class="line">    res.setHeader(<span class="string">'Last-Modified'</span>, lastModified)</span><br><span class="line">    res.writeHead(<span class="number">200</span>, <span class="string">'OK'</span>)</span><br><span class="line">    res.end(result)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>第一次请求如下：</p>
+<p><img src="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/387b188f62744390a631aecb9cb96aa9~tplv-k3u1fbpfcp-zoom-1.image" alt=""></p>
+<p>1 秒过期后，再次进行多次请求，发现返回的都是 304，命中协商缓存：</p>
+<p><img src="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/8ae57f2487a241d799dcb136b16854cc~tplv-k3u1fbpfcp-zoom-1.image" alt=""></p>
+<p>在当中我遇到了个小问题，还是报的 200 响应，请求头里有条警告信息：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Provisional headers are shown. Disable cache to see full headers.</span><br></pre></td></tr></table></figure>
+
+<p>可能是插件原因导致，于是我开了无痕模式就解决了（如果各位有其他原因解释和解决方法可以留言告诉我）</p>
+<h3 id="ETag"><a href="#ETag" class="headerlink" title="ETag"></a>ETag</h3><p><code>Last-Modified</code> 也有它的缺点，比如修改时间是 GMT 时间，只能精确到秒，如果文件在 1 秒内有多次改动，服务器并不知道文件有改动，浏览器拿不到最新的文件。而且如果文件被修改后又撤销修改了，内容还是保持原样，但是最后修改时间变了，也要重新请求。也有可能存在服务器没有准确获取文件修改时间，或与代理服务器时间不一致的情况。</p>
+<p>为了解决文件修改时间不精确带来的问题，服务器和浏览器再次协商，这次不返回时间，返回文件的唯一标识<code>ETag</code>。只有当文件内容改变时，<code>ETag</code>才改变。<code>ETag</code>的优先级高于<code>Last-Modified</code>。</p>
+<p>过程如下:</p>
+<ul>
+<li>浏览器请求资源，服务器每次返回文件的同时带上文件的唯一标识 ETag</li>
+<li>当浏览器的缓存文件过期后，浏览器带上请求头<code>If-None-Match</code>（值为上一次的<code>ETag</code>）请求服务器</li>
+<li>服务器比较请求头的<code>If-None-Match</code>和文件的 ETag 一样，则命中缓存返回 304；如果不一致就返回 200 响应和文件的内容还有更新<code>ETag</code>的值，以此往复。</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> md5 = <span class="built_in">require</span>(<span class="string">'md5'</span>)</span><br><span class="line"></span><br><span class="line">app.get(<span class="string">'/test.js'</span>, (req, res) =&gt; &#123;</span><br><span class="line">  <span class="keyword">let</span> sourcePath = path.resolve(__dirname, <span class="string">'../public/test.js'</span>)</span><br><span class="line">  <span class="keyword">let</span> result = fs.readFileSync(sourcePath)</span><br><span class="line">  <span class="keyword">let</span> etag = md5(result)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (req.headers[<span class="string">'if-none-match'</span>] === etag) &#123;</span><br><span class="line">    res.writeHead(<span class="number">304</span>, <span class="string">'Not Modified'</span>)</span><br><span class="line">    res.end()</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    res.setHeader(<span class="string">'ETag'</span>, etag)</span><br><span class="line">    res.writeHead(<span class="number">200</span>, <span class="string">'OK'</span>)</span><br><span class="line">    res.end(result)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/06e9be1e391a48a9841242a0fdc3a4e6~tplv-k3u1fbpfcp-zoom-1.image" alt=""></p>
+<p>再次请求时：</p>
+<p><img src="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/d8a2199d885748ee88b6023b7c4f8b5b~tplv-k3u1fbpfcp-zoom-1.image" alt=""></p>
+<ul>
+<li>HTTP 中并没有指定如何生成<code>ETag</code>, 实际项目中生成哈希(hash)是比较常见的做法。</li>
+</ul>
+<p>不过<code>ETag</code>每次服务端生成都需要进行读写操作，而<code>Last-Modified</code>只需要读取操作，<code>ETag</code>生成计算的消耗更大些。</p>
+<h2 id="缓存的优先级"><a href="#缓存的优先级" class="headerlink" title="缓存的优先级"></a>缓存的优先级</h2><p>首先明确的是强缓存的优先级高于协商缓存</p>
+<p>在 HTTP1.0 的时候还有个<code>Pragma</code>字段，也属于强缓存，当该字段值为 no-cache 的时候，会告诉浏览器不要对该资源缓存，即每次都得向服务器发一次请求才行，它的优先级高于<code>Cache-Control</code></p>
+<p>一般我们现在就不会用它了，如果想见到<code>Pragma</code>的话，在 Chrome 的 devtools 中启用 disable cache 时或者按 <code>Ctrl + F5</code>强制刷新，就会在请求的 Request Header 上看到。</p>
+<p><img src="https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/78b4c599e5894dcd8b2505cc410de2f5~tplv-k3u1fbpfcp-zoom-1.image" alt=""></p>
+<p>最后优先级为：</p>
+<blockquote>
+<p>Pragma &gt; Cache-Control &gt; Expires &gt; ETag &gt; Last-Modified</p>
+</blockquote>
+<h2 id="如何清除缓存"><a href="#如何清除缓存" class="headerlink" title="如何清除缓存"></a>如何清除缓存</h2><p>浏览器默认会缓存图片，css 和 js 等静态资源，有时在开发环境下可能会因为强缓存导致资源没有及时更新而看不到最新的效果，可以用如下几种方式：</p>
+<ol>
+<li>直接 Ctrl+F5 强制刷新（直接 F5 的话会跳过强缓存规则，直接走协商缓存）</li>
+<li>谷歌浏览器可以在 Network 里面选中<code>Disable cache</code></li>
+<li>给资源文件加一个时间戳</li>
+<li>其他方式设置如 webpack</li>
+</ol>
+<br>
+
+<p>案例 github 代码：<a href="https://github.com/Jacky-Summer/http-cache-demo" target="_blank" rel="noopener">http-cache-demo</a></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://www.cnblogs.com/tugenhua0707/p/10807289.html" target="_blank" rel="noopener">理解 http 浏览器的协商缓存和强制缓存</a></li>
+<li><a href="https://juejin.im/post/6844903655619969038" target="_blank" rel="noopener">前端也要懂 Http 缓存机制</a></li>
+</ul>
+<br>
+
+<ul>
+<li>ps： <a href="https://github.com/Jacky-Summer/personal-blog" target="_blank" rel="noopener">个人技术博文 Github 仓库</a>，觉得不错的话欢迎 star，鼓励我继续写作吧~</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+     
+      <div>
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:24px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+      </div>
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/HTTP/" rel="tag"><i class="fa fa-tag"></i> HTTP</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/09/26/%E6%89%8B%E5%86%99call-apply-bind%E6%96%B9%E6%B3%95/" rel="prev" title="手写call,apply,bind方法">
+      <i class="fa fa-chevron-left"></i> 手写call,apply,bind方法
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#浏览器缓存的作用"><span class="nav-number">1.</span> <span class="nav-text">浏览器缓存的作用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#概述"><span class="nav-number">2.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基本原理"><span class="nav-number">3.</span> <span class="nav-text">基本原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#缓存的文件到哪里去"><span class="nav-number">4.</span> <span class="nav-text">缓存的文件到哪里去</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#通过-express-搭建服务模拟演示"><span class="nav-number">5.</span> <span class="nav-text">通过 express 搭建服务模拟演示</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#强缓存"><span class="nav-number">6.</span> <span class="nav-text">强缓存</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Expires"><span class="nav-number">6.1.</span> <span class="nav-text">Expires</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Cache-Control"><span class="nav-number">6.2.</span> <span class="nav-text">Cache-Control</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#public"><span class="nav-number">6.2.1.</span> <span class="nav-text">public</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#private"><span class="nav-number">6.2.2.</span> <span class="nav-text">private</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#no-cache"><span class="nav-number">6.2.3.</span> <span class="nav-text">no-cache</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#no-store"><span class="nav-number">6.2.4.</span> <span class="nav-text">no-store</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#协商缓存"><span class="nav-number">7.</span> <span class="nav-text">协商缓存</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Last-Modified"><span class="nav-number">7.1.</span> <span class="nav-text">Last-Modified</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ETag"><span class="nav-number">7.2.</span> <span class="nav-text">ETag</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#缓存的优先级"><span class="nav-number">8.</span> <span class="nav-text">缓存的优先级</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何清除缓存"><span class="nav-number">9.</span> <span class="nav-text">如何清除缓存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">10.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Jacky Lin"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Jacky Lin</p>
+  <div class="site-description" itemprop="description">一个热爱技术，乐于分享的前端er</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">55</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">46</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Jacky-Summer" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Jacky-Summer" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://juejin.im/user/5d77c17bf265da03c61e7c24" title="掘金 → https:&#x2F;&#x2F;juejin.im&#x2F;user&#x2F;5d77c17bf265da03c61e7c24" rel="noopener" target="_blank"><i class="fa fa-fw fa-drupal"></i>掘金</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jacky Lin</span>
+</div>
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.7.2
+  </div>
+-->
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共101k字</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  <!-- 页面点击小红心 -->
+  
+      <script type="text/javascript" src="/js/clicklove.js"></script>
+
+</body>
+</html>
