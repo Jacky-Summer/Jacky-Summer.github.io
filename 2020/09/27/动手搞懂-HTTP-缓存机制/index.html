@@ -21,13 +21,13 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Gemini","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true,"b2t":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"jacky-summer.github.io","root":"/","scheme":"Gemini","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true,"b2t":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="HTTP 缓存策略相信大家都有一定的了解，但自己讲的话也是大概模糊的理解。于是，又回到重新归纳的环节了，这次，搞懂它！">
 <meta property="og:type" content="article">
 <meta property="og:title" content="动手搞懂 HTTP 缓存机制">
-<meta property="og:url" content="http://yoursite.com/2020/09/27/%E5%8A%A8%E6%89%8B%E6%90%9E%E6%87%82-HTTP-%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6/index.html">
+<meta property="og:url" content="https://jacky-summer.github.io/2020/09/27/%E5%8A%A8%E6%89%8B%E6%90%9E%E6%87%82-HTTP-%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6/index.html">
 <meta property="og:site_name" content="JackySummer">
 <meta property="og:description" content="HTTP 缓存策略相信大家都有一定的了解，但自己讲的话也是大概模糊的理解。于是，又回到重新归纳的环节了，这次，搞懂它！">
 <meta property="og:locale" content="zh_CN">
@@ -47,7 +47,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/fa0b4111b21043629107fb09c50533d8~tplv-k3u1fbpfcp-zoom-1.image">
 
-<link rel="canonical" href="http://yoursite.com/2020/09/27/%E5%8A%A8%E6%89%8B%E6%90%9E%E6%87%82-HTTP-%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6/">
+<link rel="canonical" href="https://jacky-summer.github.io/2020/09/27/%E5%8A%A8%E6%89%8B%E6%90%9E%E6%87%82-HTTP-%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6/">
 
 
 <script id="page-configurations">
@@ -204,7 +204,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/09/27/%E5%8A%A8%E6%89%8B%E6%90%9E%E6%87%82-HTTP-%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6/">
+    <link itemprop="mainEntityOfPage" href="https://jacky-summer.github.io/2020/09/27/%E5%8A%A8%E6%89%8B%E6%90%9E%E6%87%82-HTTP-%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">

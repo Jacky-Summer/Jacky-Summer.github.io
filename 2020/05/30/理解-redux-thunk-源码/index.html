@@ -21,13 +21,13 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Gemini","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true,"b2t":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"jacky-summer.github.io","root":"/","scheme":"Gemini","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true,"b2t":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="前面几篇我们就 Redux 展开了几篇文章，这次我们来实现 react-thunk，就不是叫实现 redux-thunk 了，直接上源码，因为源码就 11 行。如果对 Redux 中间件还不理解的，可以看我写的 Redux 文章。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="理解 redux-thunk 源码">
-<meta property="og:url" content="http://yoursite.com/2020/05/30/%E7%90%86%E8%A7%A3-redux-thunk-%E6%BA%90%E7%A0%81/index.html">
+<meta property="og:url" content="https://jacky-summer.github.io/2020/05/30/%E7%90%86%E8%A7%A3-redux-thunk-%E6%BA%90%E7%A0%81/index.html">
 <meta property="og:site_name" content="JackySummer">
 <meta property="og:description" content="前面几篇我们就 Redux 展开了几篇文章，这次我们来实现 react-thunk，就不是叫实现 redux-thunk 了，直接上源码，因为源码就 11 行。如果对 Redux 中间件还不理解的，可以看我写的 Redux 文章。">
 <meta property="og:locale" content="zh_CN">
@@ -38,7 +38,7 @@
 <meta property="article:tag" content="react-thunk">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://yoursite.com/2020/05/30/%E7%90%86%E8%A7%A3-redux-thunk-%E6%BA%90%E7%A0%81/">
+<link rel="canonical" href="https://jacky-summer.github.io/2020/05/30/%E7%90%86%E8%A7%A3-redux-thunk-%E6%BA%90%E7%A0%81/">
 
 
 <script id="page-configurations">
@@ -195,7 +195,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/05/30/%E7%90%86%E8%A7%A3-redux-thunk-%E6%BA%90%E7%A0%81/">
+    <link itemprop="mainEntityOfPage" href="https://jacky-summer.github.io/2020/05/30/%E7%90%86%E8%A7%A3-redux-thunk-%E6%BA%90%E7%A0%81/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">

@@ -21,13 +21,13 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Gemini","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true,"b2t":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"jacky-summer.github.io","root":"/","scheme":"Gemini","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true,"b2t":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="上一篇我们写完了 Iterator 迭代器，这次我们来讲下 Generator 生成器，如果不了解 Iterator 的话建议先看我上一篇博客，因为这篇会涉及迭代器的内容。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="ES6系列之Generator生成器全解析">
-<meta property="og:url" content="http://yoursite.com/2020/01/13/ES6%E7%B3%BB%E5%88%97%E4%B9%8BGenerator%E7%94%9F%E6%88%90%E5%99%A8%E5%85%A8%E8%A7%A3%E6%9E%90/index.html">
+<meta property="og:url" content="https://jacky-summer.github.io/2020/01/13/ES6%E7%B3%BB%E5%88%97%E4%B9%8BGenerator%E7%94%9F%E6%88%90%E5%99%A8%E5%85%A8%E8%A7%A3%E6%9E%90/index.html">
 <meta property="og:site_name" content="JackySummer">
 <meta property="og:description" content="上一篇我们写完了 Iterator 迭代器，这次我们来讲下 Generator 生成器，如果不了解 Iterator 的话建议先看我上一篇博客，因为这篇会涉及迭代器的内容。">
 <meta property="og:locale" content="zh_CN">
@@ -38,7 +38,7 @@
 <meta property="article:tag" content="Generator">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://yoursite.com/2020/01/13/ES6%E7%B3%BB%E5%88%97%E4%B9%8BGenerator%E7%94%9F%E6%88%90%E5%99%A8%E5%85%A8%E8%A7%A3%E6%9E%90/">
+<link rel="canonical" href="https://jacky-summer.github.io/2020/01/13/ES6%E7%B3%BB%E5%88%97%E4%B9%8BGenerator%E7%94%9F%E6%88%90%E5%99%A8%E5%85%A8%E8%A7%A3%E6%9E%90/">
 
 
 <script id="page-configurations">
@@ -195,7 +195,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/13/ES6%E7%B3%BB%E5%88%97%E4%B9%8BGenerator%E7%94%9F%E6%88%90%E5%99%A8%E5%85%A8%E8%A7%A3%E6%9E%90/">
+    <link itemprop="mainEntityOfPage" href="https://jacky-summer.github.io/2020/01/13/ES6%E7%B3%BB%E5%88%97%E4%B9%8BGenerator%E7%94%9F%E6%88%90%E5%99%A8%E5%85%A8%E8%A7%A3%E6%9E%90/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">

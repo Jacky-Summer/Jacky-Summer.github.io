@@ -21,13 +21,13 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Gemini","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true,"b2t":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"jacky-summer.github.io","root":"/","scheme":"Gemini","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true,"b2t":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="React 操作表单一直都是比较繁琐的操作，在以前用的是 redux-form， 但现在 formik 这个库设计得更加优雅，Github 的 star 数目已经远远超过 redux-form 了。做表单就是为了收集一些数据，然后进行提交。而 redux-form 理念是把这些数据存放到 reducer 中去，当我们表单多的时候，显然对整个 store 的数据管理不太友好，因为多了很多表单数据。而">
 <meta property="og:type" content="article">
 <meta property="og:title" content="使用 Formik +Yup 处理 React 表单验证">
-<meta property="og:url" content="http://yoursite.com/2020/06/13/%E4%BD%BF%E7%94%A8-Formik-Yup-%E5%A4%84%E7%90%86-React-%E8%A1%A8%E5%8D%95%E9%AA%8C%E8%AF%81/index.html">
+<meta property="og:url" content="https://jacky-summer.github.io/2020/06/13/%E4%BD%BF%E7%94%A8-Formik-Yup-%E5%A4%84%E7%90%86-React-%E8%A1%A8%E5%8D%95%E9%AA%8C%E8%AF%81/index.html">
 <meta property="og:site_name" content="JackySummer">
 <meta property="og:description" content="React 操作表单一直都是比较繁琐的操作，在以前用的是 redux-form， 但现在 formik 这个库设计得更加优雅，Github 的 star 数目已经远远超过 redux-form 了。做表单就是为了收集一些数据，然后进行提交。而 redux-form 理念是把这些数据存放到 reducer 中去，当我们表单多的时候，显然对整个 store 的数据管理不太友好，因为多了很多表单数据。而">
 <meta property="og:locale" content="zh_CN">
@@ -40,7 +40,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://user-gold-cdn.xitu.io/2020/6/13/172acf9ec35b272f?w=433&h=232&f=gif&s=31469">
 
-<link rel="canonical" href="http://yoursite.com/2020/06/13/%E4%BD%BF%E7%94%A8-Formik-Yup-%E5%A4%84%E7%90%86-React-%E8%A1%A8%E5%8D%95%E9%AA%8C%E8%AF%81/">
+<link rel="canonical" href="https://jacky-summer.github.io/2020/06/13/%E4%BD%BF%E7%94%A8-Formik-Yup-%E5%A4%84%E7%90%86-React-%E8%A1%A8%E5%8D%95%E9%AA%8C%E8%AF%81/">
 
 
 <script id="page-configurations">
@@ -197,7 +197,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/13/%E4%BD%BF%E7%94%A8-Formik-Yup-%E5%A4%84%E7%90%86-React-%E8%A1%A8%E5%8D%95%E9%AA%8C%E8%AF%81/">
+    <link itemprop="mainEntityOfPage" href="https://jacky-summer.github.io/2020/06/13/%E4%BD%BF%E7%94%A8-Formik-Yup-%E5%A4%84%E7%90%86-React-%E8%A1%A8%E5%8D%95%E9%AA%8C%E8%AF%81/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
