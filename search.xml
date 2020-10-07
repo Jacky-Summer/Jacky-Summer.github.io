@@ -12,8 +12,8 @@
         <category>Vue</category>
       </categories>
       <tags>
-        <tag>JavaScript</tag>
         <tag>Vue</tag>
+        <tag>JavaScript</tag>
         <tag>组件通信</tag>
       </tags>
   </entry>
@@ -55,8 +55,8 @@
         <category>日常总结</category>
       </categories>
       <tags>
-        <tag>JavaScript</tag>
         <tag>手写</tag>
+        <tag>JavaScript</tag>
       </tags>
   </entry>
   <entry>
@@ -221,8 +221,8 @@
         <category>深入理解JavaScript</category>
       </categories>
       <tags>
-        <tag>JavaScript</tag>
         <tag>手写</tag>
+        <tag>JavaScript</tag>
       </tags>
   </entry>
   <entry>
@@ -1179,8 +1179,8 @@
       </categories>
       <tags>
         <tag>React</tag>
-        <tag>Gatsby</tag>
         <tag>SSR</tag>
+        <tag>Gatsby</tag>
         <tag>SEO</tag>
       </tags>
   </entry>
@@ -1439,8 +1439,8 @@
       </categories>
       <tags>
         <tag>React</tag>
-        <tag>NextJS</tag>
         <tag>SSR</tag>
+        <tag>NextJS</tag>
       </tags>
   </entry>
   <entry>
@@ -2195,9 +2195,9 @@
       </categories>
       <tags>
         <tag>React</tag>
+        <tag>SSR</tag>
         <tag>Gatsby</tag>
         <tag>GraphQL</tag>
-        <tag>SSR</tag>
       </tags>
   </entry>
   <entry>
@@ -2550,8 +2550,8 @@
         <category>React笔记</category>
       </categories>
       <tags>
-        <tag>React</tag>
         <tag>手写</tag>
+        <tag>React</tag>
       </tags>
   </entry>
   <entry>
@@ -2671,9 +2671,9 @@
         <category>React笔记</category>
       </categories>
       <tags>
+        <tag>手写</tag>
         <tag>React</tag>
         <tag>react-redux</tag>
-        <tag>手写</tag>
       </tags>
   </entry>
   <entry>
@@ -2828,9 +2828,9 @@
         <category>React笔记</category>
       </categories>
       <tags>
+        <tag>手写</tag>
         <tag>React</tag>
         <tag>Redux</tag>
-        <tag>手写</tag>
       </tags>
   </entry>
   <entry>
@@ -3295,9 +3295,9 @@
         <category>React笔记</category>
       </categories>
       <tags>
+        <tag>手写</tag>
         <tag>React</tag>
         <tag>Redux</tag>
-        <tag>手写</tag>
       </tags>
   </entry>
   <entry>
