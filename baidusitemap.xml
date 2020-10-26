@@ -1,6 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://jacky-summer.github.io/2020/07/12/%E6%89%8B%E6%8A%8A%E6%89%8B%E5%B8%A6%E4%BD%A0%E5%85%A5%E9%97%A8Gatsby/</loc>
+    <lastmod>2020-10-26</lastmod>
+  </url>
+  <url>
+    <loc>https://jacky-summer.github.io/2020/09/05/%E7%94%B1%E9%9B%B6%E5%BC%80%E5%A7%8B%E4%BD%BF%E7%94%A8-Webpack-%E6%9D%A5%E6%90%AD%E5%BB%BA-React-%E9%A1%B9%E7%9B%AE/</loc>
+    <lastmod>2020-10-26</lastmod>
+  </url>
+  <url>
+    <loc>https://jacky-summer.github.io/2019/04/05/this-props-history-push%E6%96%B9%E6%B3%95%E6%8A%A5%E9%94%99%E8%A7%A3%E5%86%B3/</loc>
+    <lastmod>2020-10-26</lastmod>
+  </url>
+  <url>
+    <loc>https://jacky-summer.github.io/2020/04/28/%E6%B5%85%E8%B0%88React%E7%9A%84Context-API/</loc>
+    <lastmod>2020-10-26</lastmod>
+  </url>
+  <url>
+    <loc>https://jacky-summer.github.io/2020/04/16/React%E5%87%BD%E6%95%B0this%E7%BB%91%E5%AE%9A%E7%9A%84%E5%8E%9F%E5%9B%A0%E5%8F%8A%E5%9B%9B%E7%A7%8D%E7%BB%91%E5%AE%9A%E6%96%B9%E5%BC%8F%E5%AF%B9%E6%AF%94/</loc>
+    <lastmod>2020-10-26</lastmod>
+  </url>
+  <url>
+    <loc>https://jacky-summer.github.io/2020/05/14/%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AARedux%EF%BC%88%E5%AE%8C%E5%96%84%E7%89%88%EF%BC%89/</loc>
+    <lastmod>2020-10-26</lastmod>
+  </url>
+  <url>
+    <loc>https://jacky-summer.github.io/2020/04/22/%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA%E8%BF%B7%E4%BD%A0Redux%EF%BC%88%E5%9F%BA%E7%A1%80%E7%89%88%EF%BC%89/</loc>
+    <lastmod>2020-10-26</lastmod>
+  </url>
+  <url>
+    <loc>https://jacky-summer.github.io/2020/05/24/%E5%B8%A6%E4%BD%A0%E5%AE%9E%E7%8E%B0-react-redux/</loc>
+    <lastmod>2020-10-26</lastmod>
+  </url>
+  <url>
+    <loc>https://jacky-summer.github.io/2020/05/30/%E7%90%86%E8%A7%A3-redux-thunk-%E6%BA%90%E7%A0%81/</loc>
+    <lastmod>2020-10-26</lastmod>
+  </url>
+  <url>
+    <loc>https://jacky-summer.github.io/2020/06/06/%E3%80%90React-%E5%8E%9F%E7%90%86%EF%BC%88%E4%B8%80%EF%BC%89%E3%80%91%E5%AE%9E%E7%8E%B0-createElement-%E5%92%8C-render-%E6%96%B9%E6%B3%95/</loc>
+    <lastmod>2020-10-26</lastmod>
+  </url>
+  <url>
+    <loc>https://jacky-summer.github.io/2020/03/29/%E7%94%A8React-Antd%E5%B0%81%E8%A3%85Axios%E5%AE%9E%E7%8E%B0%E5%85%A8%E5%B1%80Loading%E6%95%88%E6%9E%9C/</loc>
+    <lastmod>2020-10-26</lastmod>
+  </url>
+  <url>
+    <loc>https://jacky-summer.github.io/2020/10/26/%E6%89%8B%E5%86%99%E6%A8%A1%E6%8B%9F%E5%AE%9E%E7%8E%B0-React-Hooks/</loc>
+    <lastmod>2020-10-26</lastmod>
+  </url>
+  <url>
     <loc>https://jacky-summer.github.io/2020/10/18/%E5%A6%82%E4%BD%95%E7%BC%96%E5%86%99%E4%B8%80%E4%B8%AA-Webpack-Plugin/</loc>
     <lastmod>2020-10-21</lastmod>
   </url>
@@ -49,22 +97,6 @@
     <lastmod>2020-09-26</lastmod>
   </url>
   <url>
-    <loc>https://jacky-summer.github.io/2020/05/14/%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AARedux%EF%BC%88%E5%AE%8C%E5%96%84%E7%89%88%EF%BC%89/</loc>
-    <lastmod>2020-09-26</lastmod>
-  </url>
-  <url>
-    <loc>https://jacky-summer.github.io/2020/04/22/%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA%E8%BF%B7%E4%BD%A0Redux%EF%BC%88%E5%9F%BA%E7%A1%80%E7%89%88%EF%BC%89/</loc>
-    <lastmod>2020-09-26</lastmod>
-  </url>
-  <url>
-    <loc>https://jacky-summer.github.io/2020/05/24/%E5%B8%A6%E4%BD%A0%E5%AE%9E%E7%8E%B0-react-redux/</loc>
-    <lastmod>2020-09-26</lastmod>
-  </url>
-  <url>
-    <loc>https://jacky-summer.github.io/2020/06/06/%E3%80%90React-%E5%8E%9F%E7%90%86%EF%BC%88%E4%B8%80%EF%BC%89%E3%80%91%E5%AE%9E%E7%8E%B0-createElement-%E5%92%8C-render-%E6%96%B9%E6%B3%95/</loc>
-    <lastmod>2020-09-26</lastmod>
-  </url>
-  <url>
     <loc>https://jacky-summer.github.io/2020/09/26/%E6%89%8B%E5%86%99call-apply-bind%E6%96%B9%E6%B3%95/</loc>
     <lastmod>2020-09-26</lastmod>
   </url>
@@ -85,10 +117,6 @@
     <lastmod>2020-09-10</lastmod>
   </url>
   <url>
-    <loc>https://jacky-summer.github.io/2020/09/05/%E7%94%B1%E9%9B%B6%E5%BC%80%E5%A7%8B%E4%BD%BF%E7%94%A8-Webpack-%E6%9D%A5%E6%90%AD%E5%BB%BA-React-%E9%A1%B9%E7%9B%AE/</loc>
-    <lastmod>2020-09-05</lastmod>
-  </url>
-  <url>
     <loc>https://jacky-summer.github.io/2020/09/03/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3-JavaScript-%E4%B9%8B%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF-Event-Loop/</loc>
     <lastmod>2020-09-03</lastmod>
   </url>
@@ -102,10 +130,6 @@
   </url>
   <url>
     <loc>https://jacky-summer.github.io/2020/01/13/ES6%E7%B3%BB%E5%88%97%E4%B9%8BGenerator%E7%94%9F%E6%88%90%E5%99%A8%E5%85%A8%E8%A7%A3%E6%9E%90/</loc>
-    <lastmod>2020-08-23</lastmod>
-  </url>
-  <url>
-    <loc>https://jacky-summer.github.io/2020/03/29/%E7%94%A8React-Antd%E5%B0%81%E8%A3%85Axios%E5%AE%9E%E7%8E%B0%E5%85%A8%E5%B1%80Loading%E6%95%88%E6%9E%9C/</loc>
     <lastmod>2020-08-23</lastmod>
   </url>
   <url>
@@ -161,15 +185,7 @@
     <lastmod>2020-08-23</lastmod>
   </url>
   <url>
-    <loc>https://jacky-summer.github.io/2020/04/28/%E6%B5%85%E8%B0%88React%E7%9A%84Context-API/</loc>
-    <lastmod>2020-08-23</lastmod>
-  </url>
-  <url>
     <loc>https://jacky-summer.github.io/2020/08/21/%E6%89%8B%E6%8A%8A%E6%89%8B%E5%B8%A6%E4%BD%A0%E5%85%A5%E9%97%A8-NextJS/</loc>
-    <lastmod>2020-08-22</lastmod>
-  </url>
-  <url>
-    <loc>https://jacky-summer.github.io/2020/07/12/%E6%89%8B%E6%8A%8A%E6%89%8B%E5%B8%A6%E4%BD%A0%E5%85%A5%E9%97%A8Gatsby/</loc>
     <lastmod>2020-08-22</lastmod>
   </url>
   <url>
@@ -189,10 +205,6 @@
     <lastmod>2020-08-01</lastmod>
   </url>
   <url>
-    <loc>https://jacky-summer.github.io/2019/04/05/this-props-history-push%E6%96%B9%E6%B3%95%E6%8A%A5%E9%94%99%E8%A7%A3%E5%86%B3/</loc>
-    <lastmod>2020-07-05</lastmod>
-  </url>
-  <url>
     <loc>https://jacky-summer.github.io/2020/06/27/%E4%B8%80%E6%96%87%E6%B1%87%E6%80%BB-CSS-%E4%B8%A4%E5%88%97%E5%B8%83%E5%B1%80%E5%92%8C%E4%B8%89%E5%88%97%E5%B8%83%E5%B1%80/</loc>
     <lastmod>2020-07-05</lastmod>
   </url>
@@ -205,16 +217,8 @@
     <lastmod>2020-06-13</lastmod>
   </url>
   <url>
-    <loc>https://jacky-summer.github.io/2020/05/30/%E7%90%86%E8%A7%A3-redux-thunk-%E6%BA%90%E7%A0%81/</loc>
-    <lastmod>2020-06-07</lastmod>
-  </url>
-  <url>
     <loc>https://jacky-summer.github.io/2018/05/12/MongoDB%E6%80%A7%E8%83%BD%E4%B9%8B%E9%80%90%E6%9D%A1%E6%8F%92%E5%85%A5%E4%B8%8E%E6%89%B9%E9%87%8F%E6%8F%92%E5%85%A5/</loc>
     <lastmod>2020-05-01</lastmod>
-  </url>
-  <url>
-    <loc>https://jacky-summer.github.io/2020/04/16/React%E5%87%BD%E6%95%B0this%E7%BB%91%E5%AE%9A%E7%9A%84%E5%8E%9F%E5%9B%A0%E5%8F%8A%E5%9B%9B%E7%A7%8D%E7%BB%91%E5%AE%9A%E6%96%B9%E5%BC%8F%E5%AF%B9%E6%AF%94/</loc>
-    <lastmod>2020-04-24</lastmod>
   </url>
   <url>
     <loc>https://jacky-summer.github.io/2019/11/16/%E5%AE%9E%E7%8E%B0swiper%E8%87%AA%E5%AE%9A%E4%B9%89%E5%88%86%E9%A1%B5%E5%99%A8/</loc>
