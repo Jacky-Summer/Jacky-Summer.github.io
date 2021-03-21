@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://jacky-summer.github.io/2021/03/21/Webpack-SourceMap-%E5%9B%9E%E9%A1%BE/</loc>
+    <lastmod>2021-03-21</lastmod>
+  </url>
+  <url>
     <loc>https://jacky-summer.github.io/2021/03/09/%E5%B8%A6%E4%BD%A0%E5%85%A5%E9%97%A8%E4%BD%93%E9%AA%8C-Vue3/</loc>
     <lastmod>2021-03-09</lastmod>
   </url>
